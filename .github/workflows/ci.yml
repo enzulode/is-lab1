@@ -1,0 +1,40 @@
+name: Linter & Static Analysis
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+defaults:
+  run:
+    working-directory: ./
+
+jobs:
+  spotless-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-java@v3
+        with:
+          java-version: 21
+          distribution: 'oracle'
+      - name: lint
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: spotlessCheck
+
+  pmd-analyse:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-java@v3
+        with:
+          java-version: 21
+          distribution: 'oracle'
+      - name: analyse-main
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: pmdMain
