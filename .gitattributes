@@ -1,0 +1,17 @@
+#
+# https://help.github.com/articles/dealing-with-line-endings/
+#
+# Linux start script should use lf
+/gradlew        text eol=lf
+*.java          text eol=lf
+*.kts           text eol=lf
+*.xml           text eol=lf
+
+# These are Windows script files and should use crlf
+*.bat           text eol=crlf
+
+# Binary files should be left untouched
+*.jar           binary
+
+# That files should not be exported through the archives
+*.md            export-ignore eol=lf
