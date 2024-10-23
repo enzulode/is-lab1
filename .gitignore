@@ -9,3 +9,6 @@ TODO.md
 
 # Ignore IDEA files
 .idea
+
+# Ignore generated keys
+keys
