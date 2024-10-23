@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: postgres-ssh-tunnel
+  name: postgres-ssh-tunnel
+  namespace: postgres-ssh
+spec:
+  replicas: 1
+  revisionHistoryLimit: 5
+  selector:
+    matchLabels:
+      app: postgres-ssh-tunnel
+  template:
+    metadata:
+      labels:
+        app: postgres-ssh-tunnel
+    spec:
+      containers:
+        - name: autossh-postgres
+          imagePullPolicy: Always
+          image: nomulex/autossh:latest
+          env:
+            - name: SSH_HOSTUSER
+              valueFrom:
+                secretKeyRef:
+                  name: pg-ssh-info
+                  key: ssh-hostuser
+            - name: SSH_HOSTNAME
+              valueFrom:
+                secretKeyRef:
+                  name: pg-ssh-info
+                  key: ssh-hostname
+            - name: SSH_HOSTPORT
+              valueFrom:
+                secretKeyRef:
+                  name: pg-ssh-info
+                  key: ssh-port
+            - name: SSH_MODE
+              value: "-g -L"
+            - name: SSH_KEY_FILE
+              value: /ssh/private-key
+            - name: SSH_TUNNEL_REMOTE
+              value: "5432"
+            - name: SSH_TUNNEL_HOST
+              value: "0.0.0.0"
+            - name: SSH_LOCAL_IP
+              value: "localhost"
+            - name: SSH_TUNNEL_LOCAL
+              value: "5432"
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+            - name: ssh-key-path
+              mountPath: /ssh/private-key
+              subPath: private-key
+              readOnly: true
+      volumes:
+        - name: ssh-key-path
+          secret:
+            secretName: pg-ssh-keys
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
