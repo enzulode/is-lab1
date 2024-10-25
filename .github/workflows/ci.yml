@@ -4,9 +4,17 @@ on:
   push:
     branches:
       - master
+    paths-ignore:
+      - "k8s"
+      - "*.md"
+      - ".gitignore"
   pull_request:
     branches:
       - master
+    paths-ignore:
+      - "k8s"
+      - "*.md"
+      - ".gitignore"
 
 defaults:
   run:
