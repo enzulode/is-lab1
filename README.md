@@ -43,8 +43,6 @@
       --from-literal=pg-pass=<password> \
       --from-literal=pg-database=<database>
     ```
-    
-3. Deploy helpers
 
     Apply several configurations to make remote postgresql database accessible
     within your k8s cluster using the FQDN: deploy the ssh-tunneling container 
@@ -57,6 +55,51 @@
     kubectl apply -f ./k8s/postgres-ssh-tunnel-deployment.yaml
     kubectl apply -f ./k8s/postgres-ssh-tunnel-service.yaml
     kubectl apply -f ./k8s/postgres-ssh-tunnel-networkpolicy.yaml
+    ```
+
+3. Setup Keycloak with PostgreSQL database
+
+    We are going to use bitnami helm chart with keycloak. Firstly, we have to create 
+    our TLS certificates and some other data for the Keycloak. So let's make in done.
+    
+    The following set of commands will generate us a self-signed TLS certificate and
+    add this certificate as the k8s secret.
+    ```bash
+    openssl genrsa -out keys/keycloak.key 2048
+    openssl req -new -key  keys/keycloak.key -out  keys/keycloak.csr
+    openssl x509 -req -in keys/keycloak.csr -signkey keys/keycloak.key -out keys/keycloak.crt -days 365
+    kubectl create secret tls <keycloak_hostname>-tls \
+      --cert=keys/<cert_name>.crt \
+      --key=keys/<cert_key_name>.key \
+      --create-namespace \
+      --namespace keycloak
+    ```
+    
+    Now we have to create secrets for various keycloak-related credentials
+    ```bash
+    kubectl create secret generic keycloak-admin-password \
+      -n keycloak \
+      --from-literal=password=<admin_password>
+    ```
+    
+    Let's generate TLS cert to secure Keycloak connections within the cluster.
+    In order to do that we have to create another tls secret for our cluster.
+    ```bash
+    openssl genrsa -out keys/keycloak_internal.key 2048
+    openssl req -new -key keys/keycloak_internal.key -out keys/keycloak_internal.csr
+    openssl x509 -req -in keys/keycloak_internal.csr -signkey keys/keycloak_internal.key -out keys/keycloak_internal.crt -days 365
+    kubectl create secret tls keycloak-internal-tls \
+      --cert=keys/<internal_cert_name>.crt \
+      --key=keys/<internal_cert_key_name>.key \
+      --namespace keycloak
+    ```
+    That TLS certificate with be used on the cluster-wide connections to the 
+    Keycloak. In the future another similar secret will be created in the
+    application-containing namespace (`dev` in our case).
+    
+    Now use `helm` to install the keycloak alongside with postgresql
+    ```bash
+    helm install dev-keycloak bitnami/keycloak --namespace keycloak -f k8s/keycloak-and-pg-helm-values.yaml
     ```
 
 4. TO BE CONTINUED...
