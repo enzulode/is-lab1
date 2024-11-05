@@ -3,6 +3,7 @@
 [versions]
 springBootGradlePluginVersion = "3.3.4"
 springDependencyManagementGradlePluginVersion = "1.1.6"
+springCloudVersion = "2023.0.3"
 
 [plugins]
 springBootGradlePlugin = { id = "org.springframework.boot", version.ref = "springBootGradlePluginVersion" }
