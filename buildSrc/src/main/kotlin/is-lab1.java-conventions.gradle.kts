@@ -20,7 +20,6 @@ spotless {
         removeUnusedImports()
         cleanthat()
         googleJavaFormat()
-            .aosp()
             .reflowLongStrings(false)
             .reorderImports(true)
             .skipJavadocFormatting()
