@@ -57,49 +57,63 @@
     kubectl apply -f ./k8s/postgres-ssh-tunnel-networkpolicy.yaml
     ```
 
-3. Setup Keycloak with PostgreSQL database
+3. Setup PostgreSQL database for the Keycloak
 
-    We are going to use bitnami helm chart with keycloak. Firstly, we have to create 
-    our TLS certificates and some other data for the Keycloak. So let's make in done.
-    
-    The following set of commands will generate us a self-signed TLS certificate and
-    add this certificate as the k8s secret.
+    Prepare the persistence volume claim for the database with
     ```bash
-    openssl genrsa -out keys/keycloak.key 2048
-    openssl req -new -key  keys/keycloak.key -out  keys/keycloak.csr
-    openssl x509 -req -in keys/keycloak.csr -signkey keys/keycloak.key -out keys/keycloak.crt -days 365
-    kubectl create secret tls <keycloak_hostname>-tls \
-      --cert=keys/<cert_name>.crt \
-      --key=keys/<cert_key_name>.key \
-      --create-namespace \
-      --namespace keycloak
+    kubectl apply -f ./k8s/keycloak-db-namespace.yaml
+    kubectl apply -f ./k8s/keycloak-db-storage-class.yaml
+    kubectl apply -f ./k8s/keycloak-db-pv.yaml
+    kubectl apply -f ./k8s/keycloak-db-pvc.yaml
+    ```
+
+    We have to generate development CA for future TLS certificates signing. Execute 
+    following commands to make this happen.
+    ```bash
+    openssl genrsa -des3 -out keys/<dev_CA_name>.key 2048
+    openssl req -x509 -new -nodes -key keys/<dev_CA_name>.key -sha256 -days 1825 -out keys/<dev_CA_name>.pem
+    ```
+    After that install the generated CA in your system.
+    
+    And then generate TLS certificate for the PostgreSQL
+    ```bash
+    openssl genrsa -out keys/<tls_cert_key>.key 2048
+    openssl req -new -key keys/<tls_cert_key>.key -out keys/<tls_cert_req>.csr
+    openssl x509 -req -sha256 -days 825 -CAcreateserial \
+      -CA keys/<dev_CA_name>.pem \
+      -CAkey keys/<dev_CA_name>.key \
+      -in keys/<tls_cert_req>.csr \
+      -out keys/<tls_cert_name>.crt
     ```
     
-    Now we have to create secrets for various keycloak-related credentials
+    Create k8s secret that stores tls certificates for the PostgreSQL
     ```bash
-    kubectl create secret generic keycloak-admin-password \
-      -n keycloak \
-      --from-literal=password=<admin_password>
+    kubectl create secret tls keycloak-postgresql-tls -n keycloak-db \
+      --key=keys/<tls_cert_key>.key \
+      --cert=keys/<tls_cert_name>.crt
     ```
     
-    Let's generate TLS cert to secure Keycloak connections within the cluster.
-    In order to do that we have to create another tls secret for our cluster.
+    Now we have to deploy PostgreSQL using helm
     ```bash
-    openssl genrsa -out keys/keycloak_internal.key 2048
-    openssl req -new -key keys/keycloak_internal.key -out keys/keycloak_internal.csr
-    openssl x509 -req -in keys/keycloak_internal.csr -signkey keys/keycloak_internal.key -out keys/keycloak_internal.crt -days 365
-    kubectl create secret tls keycloak-internal-tls \
-      --cert=keys/<internal_cert_name>.crt \
-      --key=keys/<internal_cert_key_name>.key \
-      --namespace keycloak
+    helm install dev bitnami/postgresql --namespace keycloak-db \
+      --set primary.persistence.existingClaim=<postgresql_pvc_name> \
+      --set auth.postgresPassword=<postgresql_password> \
+      --set volumePermissions.enabled=true \
+      --set tls.enabled=true \
+      --set tls.certificatesSecret=keycloak-postgresql-tls \
+      --set tls.certFilename=tls.crt \
+      --set tls.certKeyFilename=tls.key
     ```
-    That TLS certificate with be used on the cluster-wide connections to the 
-    Keycloak. In the future another similar secret will be created in the
-    application-containing namespace (`dev` in our case).
+   
+    Connect to the database (e.g. through the IDEA database integration) and create
+    separate database for the keycloak.
     
-    Now use `helm` to install the keycloak alongside with postgresql
-    ```bash
-    helm install dev-keycloak bitnami/keycloak --namespace keycloak -f k8s/keycloak-and-pg-helm-values.yaml
+    ```postgresql
+    CREATE ROLE keycloak_database_username WITH LOGIN ENCRYPTED PASSWORD 'keycloak_database_password';
+    CREATE DATABASE keycloak_db OWNER keycloak_database_username;
     ```
+    
+    Replace `keycloak_database_username`, `keycloak_database_password`, `keycloak_db` with
+    desired values.
 
 4. TO BE CONTINUED...
