@@ -1,0 +1,22 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: organization-management
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://postgres.postgres-ssh.svc.cluster.local:5432/studs
+    username: ${PG_USERNAME}
+    password: ${PG_PASSWORD}
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://dev-keycloak.keycloak.svc.cluster.local/realms/${KC_RESOURCE_SERVER_REALM_NAME}/protocol/openid-connect/certs
