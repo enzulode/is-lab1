@@ -116,4 +116,77 @@
     Replace `keycloak_database_username`, `keycloak_database_password`, `keycloak_db` with
     desired values.
 
-4. TO BE CONTINUED...
+4. Setup Keycloak
+
+    Create the keycloak namespace using
+    ```bash
+    kubectl apply -f ./k8s/keycloak-namespace.yaml
+    ```
+    
+    Create k8s secret for the generated CA.
+    ```bash
+    kubectl create secret generic keycloak-postgresql-tls-ca -n keycloak \
+      --from-file=ca.crt=keys/<dev_CA_name>.pem
+    ```
+    
+    Create k8s secret with external database configuration
+    ```bash
+    kubectl create secret generic keycloak-external-postgresql-cfg -n keycloak \
+      --from-literal=external-host=<external_db_FQDN> \
+      --from-literal=external-port=<external_db_port> \
+      --from-literal=external-user=<external_db_user> \
+      --from-literal=external-database=<external_database> \
+      --from-literal=external-password=<external_database_password>
+    ```
+    
+    Create k8s secret with keycloak admin credentials
+    ```bash
+    kubectl create secret generic keycloak-admin-password -n keycloak \
+      --from-literal=password=admin
+    ```
+    
+    Generate TLS certificate for the keycloak SSO ingress
+    ```bash
+    openssl genrsa -out keys/<sso_tls>.key 2048
+    openssl req -new \
+      -key keys/<sso_tls>.key \
+      -out keys/<sso_tls>.csr
+    openssl x509 -req -sha256 -days 825 -CAcreateserial \
+          -CA keys/<dev_CA_name>.pem \
+          -CAkey keys/<dev_CA_name>.key \
+          -in keys/<sso_tls>.csr \
+          -out keys/<sso_tls>.crt
+    ```
+    
+    And for Admin ingress
+    ```bash
+    openssl genrsa -out keys/<admin_tls>.key 2048
+    openssl req -new \
+      -key keys/<admin_tls>.key \
+      -out keys/<admin_tls>.csr
+    openssl x509 -req -sha256 -days 825 -CAcreateserial \
+          -CA keys/<dev_CA_name>.pem \
+          -CAkey keys/<dev_CA_name>.key \
+          -in keys/<admin_tls>.csr \
+          -out keys/<admin_tls>.crt
+    ```
+    
+    And now create k8s secrets for the generated TLS certificates
+    ```bash
+    kubectl create secret tls sso-keycloak-local-tls -n keycloak \
+      --key=keys/<sso_tls>.key \
+      --cert=keys/<sso_tls>.crt
+    ```
+    ```bash
+    kubectl create secret tls admin-keycloak-local-tls -n keycloak \
+      --key=keys/<admin_tls>.key \
+      --cert=keys/<admin_tls>.crt
+    ```
+    
+    Deploy keycloak with the external PostgreSQL database and enforced
+    SSL/TLS for the DB interconnections.
+    ```bash
+    helm install dev bitnami/keycloak --namespace keycloak -f ./k8s/keycloak-values-helm.yaml
+    ```
+
+5. TO BE CONTINUED...
