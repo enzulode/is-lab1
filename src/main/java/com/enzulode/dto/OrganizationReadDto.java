@@ -1,5 +1,6 @@
 package com.enzulode.dto;
 
+import com.enzulode.dao.entity.Organization;
 import com.enzulode.dao.entity.OrganizationType;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDateTime;
@@ -19,4 +20,20 @@ public record OrganizationReadDto(
     OrganizationType type,
     AddressReadDto postalAddressId
     // formatter:on
-    ) {}
+    ) {
+
+  public static OrganizationReadDto toReadDtoForRead(Organization organization) {
+    return new OrganizationReadDto(
+        organization.getId(),
+        organization.getName(),
+        CoordinatesReadDto.toReadDtoForRead(organization.getCoordinates()),
+        organization.getCreationDate(),
+        AddressReadDto.toReadDtoForRead(organization.getOfficialAddress()),
+        organization.getAnnualTurnover(),
+        organization.getEmployeesCount(),
+        organization.getRating(),
+        organization.getFullName(),
+        organization.getType(),
+        AddressReadDto.toReadDtoForRead(organization.getPostalAddress()));
+  }
+}
