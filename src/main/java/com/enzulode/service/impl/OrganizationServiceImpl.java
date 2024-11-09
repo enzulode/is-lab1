@@ -9,10 +9,9 @@ import com.enzulode.dao.repository.OrganizationRepository;
 import com.enzulode.dto.*;
 import com.enzulode.exception.*;
 import com.enzulode.service.OrganizationService;
-import java.security.Principal;
+import com.enzulode.util.SecurityContextHelper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,25 +21,28 @@ public class OrganizationServiceImpl implements OrganizationService {
   private final CoordinatesRepository coordinatesRepository;
   private final AddressRepository addressRepository;
   private final OrganizationRepository organizationRepository;
+  private final SecurityContextHelper contextHelper;
 
   public OrganizationServiceImpl(
       CoordinatesRepository coordinatesRepository,
       AddressRepository addressRepository,
-      OrganizationRepository organizationRepository) {
+      OrganizationRepository organizationRepository,
+      SecurityContextHelper contextHelper) {
     this.coordinatesRepository = coordinatesRepository;
     this.addressRepository = addressRepository;
     this.organizationRepository = organizationRepository;
+    this.contextHelper = contextHelper;
   }
 
   @Override
   @Transactional
   public OrganizationReadDto create(OrganizationMutationDto data) {
     // formatter:off
-    Coordinates existingCoordinates = coordinatesRepository.findByIdAndCreatedBy(data.coordinatesId(), findUserName())
+    Coordinates existingCoordinates = coordinatesRepository.findByIdAndCreatedBy(data.coordinatesId(), contextHelper.findUserName())
         .orElseThrow(() -> new CoordinatesNotFoundException("Failed to create organization: coordinates not found"));
-    Address existingOfficialAddress = addressRepository.findByIdAndCreatedBy(data.officialAddressId(), findUserName())
+    Address existingOfficialAddress = addressRepository.findByIdAndCreatedBy(data.officialAddressId(), contextHelper.findUserName())
         .orElseThrow(() -> new AddressNotFoundException("Failed to create organization: official address not found"));
-    Address existingPostalAddress = addressRepository.findByIdAndCreatedBy(data.officialAddressId(), findUserName())
+    Address existingPostalAddress = addressRepository.findByIdAndCreatedBy(data.officialAddressId(), contextHelper.findUserName())
         .orElseThrow(() -> new AddressNotFoundException("Failed to create organization: postal address not found"));
 
     Organization newOrganization =
@@ -69,13 +71,13 @@ public class OrganizationServiceImpl implements OrganizationService {
   @Transactional
   public OrganizationReadDto update(Integer id, OrganizationMutationDto data) {
     // formatter:off
-    Coordinates existingCoordinates = coordinatesRepository.findByIdAndCreatedBy(data.coordinatesId(), findUserName())
+    Coordinates existingCoordinates = coordinatesRepository.findByIdAndCreatedBy(data.coordinatesId(), contextHelper.findUserName())
         .orElseThrow(() -> new CoordinatesNotFoundException("Failed to update organization: coordinates not found"));
-    Address existingOfficialAddress = addressRepository.findByIdAndCreatedBy(data.officialAddressId(), findUserName())
+    Address existingOfficialAddress = addressRepository.findByIdAndCreatedBy(data.officialAddressId(), contextHelper.findUserName())
         .orElseThrow(() -> new AddressNotFoundException("Failed to update organization: official address not found"));
-    Address existingPostalAddress = addressRepository.findByIdAndCreatedBy(data.officialAddressId(), findUserName())
+    Address existingPostalAddress = addressRepository.findByIdAndCreatedBy(data.officialAddressId(), contextHelper.findUserName())
         .orElseThrow(() -> new AddressNotFoundException("Failed to update organization: postal address not found"));
-    Organization existingOrganization = organizationRepository.findByIdAndCreatedBy(id, findUserName())
+    Organization existingOrganization = organizationRepository.findByIdAndCreatedBy(id, contextHelper.findUserName())
         .map(organization -> {
           organization.setName(data.name());
           organization.setCoordinates(existingCoordinates);
@@ -98,17 +100,6 @@ public class OrganizationServiceImpl implements OrganizationService {
   @Override
   @Transactional
   public void delete(Long id) {
-    organizationRepository.deleteByIdAndCreatedBy(id, findUserName());
-  }
-
-  private String findUserName() {
-    Principal principal = SecurityContextHolder.getContext().getAuthentication();
-    // formatter:off
-    if (principal.getName() == null)
-      throw new UnauthorizedOperationException(
-          "Unable to perform operation: no information about the authentication is present."
-      );
-    return principal.getName();
-    // formatter:on
+    organizationRepository.deleteByIdAndCreatedBy(id, contextHelper.findUserName());
   }
 }

@@ -5,12 +5,10 @@ import com.enzulode.dao.repository.CoordinatesRepository;
 import com.enzulode.dto.CoordinatesMutationDto;
 import com.enzulode.dto.CoordinatesReadDto;
 import com.enzulode.exception.CoordinatesNotFoundException;
-import com.enzulode.exception.UnauthorizedOperationException;
 import com.enzulode.service.CoordinatesService;
-import java.security.Principal;
+import com.enzulode.util.SecurityContextHelper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,9 +16,12 @@ import org.springframework.transaction.annotation.Transactional;
 public class CoordinatesServiceImpl implements CoordinatesService {
 
   private final CoordinatesRepository repository;
+  private final SecurityContextHelper contextHelper;
 
-  public CoordinatesServiceImpl(CoordinatesRepository repository) {
+  public CoordinatesServiceImpl(
+      CoordinatesRepository repository, SecurityContextHelper contextHelper) {
     this.repository = repository;
+    this.contextHelper = contextHelper;
   }
 
   @Override
@@ -42,7 +43,7 @@ public class CoordinatesServiceImpl implements CoordinatesService {
   @Transactional
   public CoordinatesReadDto update(Long id, CoordinatesMutationDto data) {
     // formatter:off
-    Coordinates existingCoordinatesWithUpdatedFields = repository.findByIdAndCreatedBy(id, findUserName())
+    Coordinates existingCoordinatesWithUpdatedFields = repository.findByIdAndCreatedBy(id, contextHelper.findUserName())
         .map(coords -> CoordinatesMutationDto.toEntityForUpdate(coords, data))
         .orElseThrow(() -> new CoordinatesNotFoundException("Unable to update coordinates: the old one not found"));
     Coordinates updatedCoordinates = repository.save(existingCoordinatesWithUpdatedFields);
@@ -53,17 +54,6 @@ public class CoordinatesServiceImpl implements CoordinatesService {
   @Override
   @Transactional
   public void delete(Long id) {
-    repository.deleteByIdAndCreatedBy(id, findUserName());
-  }
-
-  private String findUserName() {
-    Principal principal = SecurityContextHolder.getContext().getAuthentication();
-    // formatter:off
-    if (principal.getName() == null)
-      throw new UnauthorizedOperationException(
-          "Unable to perform operation: no information about the authentication is present."
-      );
-    return principal.getName();
-    // formatter:on
+    repository.deleteByIdAndCreatedBy(id, contextHelper.findUserName());
   }
 }
