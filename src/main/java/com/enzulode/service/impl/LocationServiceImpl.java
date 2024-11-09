@@ -4,7 +4,6 @@ import com.enzulode.dao.entity.Location;
 import com.enzulode.dao.repository.LocationRepository;
 import com.enzulode.dto.LocationMutationDto;
 import com.enzulode.dto.LocationReadDto;
-import com.enzulode.exception.LocationCreationFailedException;
 import com.enzulode.exception.LocationNotFoundException;
 import com.enzulode.exception.UnauthorizedOperationException;
 import com.enzulode.service.LocationService;
@@ -28,41 +27,33 @@ public class LocationServiceImpl implements LocationService {
   @Transactional
   public LocationReadDto create(LocationMutationDto data) {
     // formatter:off
-    Location newLocation = new Location(data.x(), data.y(), data.z());
+    Location newLocation = LocationMutationDto.toEntityForCreate(data);
     Location result = repository.save(newLocation);
-    if (result.getId() == null) throw new LocationCreationFailedException("Failed to save location to the DB");
-    return new LocationReadDto(result.getId(), result.getX(), result.getY(), result.getZ());
+    return LocationReadDto.toReadDtoForRead(result);
     // formatter:on
   }
 
   @Override
   public Page<LocationReadDto> findAll(Pageable pageable) {
-    return repository.findAll(pageable).map(this::convertEntityToReadDto);
+    return repository.findAll(pageable).map(LocationReadDto::toReadDtoForRead);
   }
 
   @Override
   @Transactional
   public LocationReadDto update(Long id, LocationMutationDto data) {
     // formatter:off
-    Location existingLocation = repository.findByIdAndCreatedBy(id, findUserName())
+    Location existingLocationWithUpdatedFields = repository.findByIdAndCreatedBy(id, findUserName())
+        .map(location -> LocationMutationDto.toEntityForUpdate(location, data))
         .orElseThrow(() -> new LocationNotFoundException("Unable to update location: the old one not found"));
-    existingLocation.setX(data.x());
-    existingLocation.setY(data.y());
-    existingLocation.setZ(data.z());
-    Location updatedLocation = repository.save(existingLocation);
-    return new LocationReadDto(updatedLocation.getId(),
-        updatedLocation.getX(), updatedLocation.getY(), updatedLocation.getZ());
+    Location updatedLocation = repository.save(existingLocationWithUpdatedFields);
+    return LocationReadDto.toReadDtoForRead(updatedLocation);
     // formatter:on
   }
 
   @Override
   @Transactional
   public void delete(Long id) {
-    repository.deleteByIdAndCreatedBy(id, findUserName());
-  }
-
-  private LocationReadDto convertEntityToReadDto(Location entity) {
-    return new LocationReadDto(entity.getId(), entity.getX(), entity.getY(), entity.getZ());
+    repository.deleteByIdAndCreatedBy(id, findUserName());  
   }
 
   private String findUserName() {
