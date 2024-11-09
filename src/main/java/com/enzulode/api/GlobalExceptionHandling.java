@@ -11,17 +11,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 public class GlobalExceptionHandling {
 
   @ExceptionHandler({
-    CoordinatesCreationFailedException.class,
-    LocationCreationFailedException.class,
-    AddressCreationFailedException.class,
-    OrganizationCreationFailedException.class
-  })
-  public ResponseEntity<ErrorResponseDto> handleCoordinatesCreationFailure(RuntimeException cause) {
-    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-        .body(new ErrorResponseDto(cause.getMessage()));
-  }
-
-  @ExceptionHandler({
     CoordinatesNotFoundException.class,
     LocationNotFoundException.class,
     AddressNotFoundException.class,
