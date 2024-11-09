@@ -6,8 +6,6 @@ import com.enzulode.dao.repository.AddressRepository;
 import com.enzulode.dao.repository.LocationRepository;
 import com.enzulode.dto.AddressMutationDto;
 import com.enzulode.dto.AddressReadDto;
-import com.enzulode.dto.LocationReadDto;
-import com.enzulode.exception.AddressCreationFailedException;
 import com.enzulode.exception.AddressNotFoundException;
 import com.enzulode.exception.LocationNotFoundException;
 import com.enzulode.exception.UnauthorizedOperationException;
@@ -39,28 +37,30 @@ public class AddressServiceImpl implements AddressService {
         .orElseThrow(() -> new LocationNotFoundException("Failed to create address: town not found"));
     Address newAddress = new Address(data.street(), existingTown);
     Address result = addressRepository.save(newAddress);
-    if (result.getId() == null) throw new AddressCreationFailedException("Failed to save address to the DB");
-    return convertEntityToReadDto(result);
+    return AddressReadDto.toReadDtoForRead(result);
     // formatter:on
   }
 
   @Override
   public Page<AddressReadDto> findAll(Pageable pageable) {
-    return addressRepository.findAll(pageable).map(this::convertEntityToReadDto);
+    return addressRepository.findAll(pageable).map(AddressReadDto::toReadDtoForRead);
   }
 
   @Override
   @Transactional
   public AddressReadDto update(Long id, AddressMutationDto data) {
     // formatter:off
-    Address existingAddress = addressRepository.findByIdAndCreatedBy(id, findUserName())
-        .orElseThrow(() -> new AddressNotFoundException("Unable to update address: the old one not found"));
     Location newTown = locationRepository.findByIdAndCreatedBy(data.townId(), findUserName())
             .orElseThrow(() -> new LocationNotFoundException("Failed to update address: new town was not found"));
-    existingAddress.setStreet(data.street());
-    existingAddress.setTown(newTown);
-    Address result = addressRepository.save(existingAddress);
-    return convertEntityToReadDto(result);
+    Address existingAddressWithUpdatedFields = addressRepository.findByIdAndCreatedBy(id, findUserName())
+        .map(address -> {
+          address.setStreet(data.street());
+          address.setTown(newTown);
+          return address;
+        })
+        .orElseThrow(() -> new AddressNotFoundException("Unable to update address: the old one not found"));
+    Address updatedAddress = addressRepository.save(existingAddressWithUpdatedFields);
+    return AddressReadDto.toReadDtoForRead(updatedAddress);
     // formatter:on
   }
 
@@ -68,16 +68,6 @@ public class AddressServiceImpl implements AddressService {
   @Transactional
   public void delete(Long id) {
     addressRepository.deleteByIdAndCreatedBy(id, findUserName());
-  }
-
-  private AddressReadDto convertEntityToReadDto(Address entity) {
-    LocationReadDto locationReadDto =
-        new LocationReadDto(
-            entity.getTown().getId(),
-            entity.getTown().getX(),
-            entity.getTown().getY(),
-            entity.getTown().getZ());
-    return new AddressReadDto(entity.getId(), entity.getStreet(), locationReadDto);
   }
 
   private String findUserName() {
