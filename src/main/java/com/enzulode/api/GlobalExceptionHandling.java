@@ -20,4 +20,11 @@ public class GlobalExceptionHandling {
     return ResponseEntity.status(HttpStatus.BAD_REQUEST)
         .body(new ErrorResponseDto(cause.getMessage()));
   }
+
+  @ExceptionHandler({UnauthorizedOperationException.class})
+  public ResponseEntity<ErrorResponseDto> handleUnauthorizedOperationException(
+      RuntimeException cause) {
+    return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+        .body(new ErrorResponseDto(cause.getMessage()));
+  }
 }
