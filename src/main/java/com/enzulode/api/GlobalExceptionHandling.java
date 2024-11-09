@@ -3,9 +3,9 @@ package com.enzulode.api;
 import com.enzulode.dto.ErrorResponseDto;
 import com.enzulode.exception.*;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ControllerAdvice
 public class GlobalExceptionHandling {
@@ -13,20 +13,22 @@ public class GlobalExceptionHandling {
   @ExceptionHandler({
     CoordinatesCreationFailedException.class,
     LocationCreationFailedException.class,
-    AddressCreationFailedException.class
+    AddressCreationFailedException.class,
+    OrganizationCreationFailedException.class
   })
-  @ResponseStatus(HttpStatus.BAD_REQUEST)
-  public ErrorResponseDto handleCoordinatesCreationFailure(Throwable cause) {
-    return new ErrorResponseDto(cause.getMessage());
+  public ResponseEntity<ErrorResponseDto> handleCoordinatesCreationFailure(RuntimeException cause) {
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+        .body(new ErrorResponseDto(cause.getMessage()));
   }
 
   @ExceptionHandler({
     CoordinatesNotFoundException.class,
     LocationNotFoundException.class,
-    AddressNotFoundException.class
+    AddressNotFoundException.class,
+    OrganizationNotFoundException.class
   })
-  @ResponseStatus(HttpStatus.BAD_REQUEST)
-  public ErrorResponseDto handleCoordinatesNotFoundFailure(Throwable cause) {
-    return new ErrorResponseDto(cause.getMessage());
+  public ResponseEntity<ErrorResponseDto> handleCoordinatesNotFoundFailure(RuntimeException cause) {
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+        .body(new ErrorResponseDto(cause.getMessage()));
   }
 }
