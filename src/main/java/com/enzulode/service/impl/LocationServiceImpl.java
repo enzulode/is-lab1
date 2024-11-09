@@ -53,7 +53,7 @@ public class LocationServiceImpl implements LocationService {
   @Override
   @Transactional
   public void delete(Long id) {
-    repository.deleteByIdAndCreatedBy(id, findUserName());  
+    repository.deleteByIdAndCreatedBy(id, findUserName());
   }
 
   private String findUserName() {
