@@ -13,12 +13,12 @@ public class Organization extends BusinessEntity {
 
   private String name;
 
-  @OneToOne(optional = false, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+  @OneToOne(optional = false, fetch = FetchType.EAGER)
   private Coordinates coordinates;
 
   private LocalDateTime creationDate;
 
-  @OneToOne(optional = false, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+  @OneToOne(optional = false, fetch = FetchType.EAGER)
   private Address officialAddress;
 
   private int annualTurnover;
@@ -32,7 +32,7 @@ public class Organization extends BusinessEntity {
   @Enumerated(EnumType.STRING)
   private OrganizationType type;
 
-  @OneToOne(optional = false, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+  @OneToOne(optional = false, fetch = FetchType.EAGER)
   private Address postalAddress;
 
   public Organization() {}
