@@ -1,10 +1,9 @@
 package com.enzulode.dao.entity;
 
 import com.enzulode.dao.entity.common.BusinessEntity;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+import java.util.ArrayList;
+import java.util.Collection;
 
 @Entity
 public class Coordinates extends BusinessEntity {
@@ -16,6 +15,9 @@ public class Coordinates extends BusinessEntity {
   private Float x;
 
   private int y;
+
+  @OneToMany(mappedBy = "coordinates")
+  private Collection<Organization> organizations = new ArrayList<>();
 
   public Coordinates() {}
 

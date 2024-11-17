@@ -13,12 +13,14 @@ public class Organization extends BusinessEntity {
 
   private String name;
 
-  @OneToOne(optional = false, fetch = FetchType.EAGER)
+  @ManyToOne
+  @JoinColumn(name = "coordinates_id")
   private Coordinates coordinates;
 
   private LocalDateTime creationDate;
 
-  @OneToOne(optional = false, fetch = FetchType.EAGER)
+  @ManyToOne
+  @JoinColumn(name = "official_address_id")
   private Address officialAddress;
 
   private int annualTurnover;
@@ -32,7 +34,8 @@ public class Organization extends BusinessEntity {
   @Enumerated(EnumType.STRING)
   private OrganizationType type;
 
-  @OneToOne(optional = false, fetch = FetchType.EAGER)
+  @ManyToOne
+  @JoinColumn(name = "postal_address_id")
   private Address postalAddress;
 
   public Organization() {}
