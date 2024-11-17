@@ -5,13 +5,20 @@ spring:
   application:
     name: organization-management
 
+  cloud:
+    kubernetes:
+      discovery:
+        all-namespaces: true
+
   jpa:
     hibernate:
       ddl-auto: create-drop
+    properties:
+      hibernate.show_sql: true
 
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://postgres.postgres-ssh.svc.cluster.local:5432/studs
+    url: ${PG_JDBC_URI}
     username: ${PG_USERNAME}
     password: ${PG_PASSWORD}
 
@@ -19,4 +26,30 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          jwk-set-uri: http://dev-keycloak.keycloak.svc.cluster.local/realms/${KC_RESOURCE_SERVER_REALM_NAME}/protocol/openid-connect/certs
+          jwk-set-uri: ${KC_JWK_SET_URI}
+
+management:
+  metrics:
+    distribution:
+      percentiles-histogram:
+        http:
+          server:
+            requests: true
+  tracing:
+    sampling:
+      probability: 1.0
+  zipkin:
+    tracing:
+      endpoint: ${ZIPKIN_ENDPOINT}
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    health:
+      probes:
+        enabled: true
+        add-additional-paths: true
+logging:
+  pattern:
+    level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
