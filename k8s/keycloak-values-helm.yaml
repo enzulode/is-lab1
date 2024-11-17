@@ -636,7 +636,7 @@ ingress:
   controller: default
   ## @param ingress.hostname Default host for the ingress record (evaluated as template)
   ##
-  hostname: sso.keycloak.local
+  hostname: sso.keycloak.localdev
   ## @param ingress.hostnameStrict Disables dynamically resolving the hostname from request headers.
   ## Should always be set to true in production, unless your reverse proxy overwrites the Host header.
   ## If enabled, the hostname option needs to be specified.
@@ -701,7 +701,7 @@ ingress:
   extraTls:
     - secretName: "sso-keycloak-local-tls"
       hosts:
-        - sso.keycloak.local
+        - sso.keycloak.localdev
 
   ## @param ingress.secrets If you're providing your own certificates, please use this to add the certificates as secrets
   ## key and certificate should start with -----BEGIN CERTIFICATE----- or
@@ -757,7 +757,7 @@ adminIngress:
   controller: default
   ## @param adminIngress.hostname Default host for the admin ingress record (evaluated as template)
   ##
-  hostname: admin.keycloak.local
+  hostname: admin.keycloak.localdev
   ## @param adminIngress.path [string] Default path for the admin ingress record (evaluated as template)
   ##
   path: "{{ .Values.httpRelativePath }}"
@@ -817,7 +817,7 @@ adminIngress:
   extraTls:
     - secretName: "admin-keycloak-local-tls"
       hosts:
-        - admin.keycloak.local
+        - admin.keycloak.localdev
 
   ## @param adminIngress.secrets If you're providing your own certificates, please use this to add the certificates as secrets
   ## key and certificate should start with -----BEGIN CERTIFICATE----- or
