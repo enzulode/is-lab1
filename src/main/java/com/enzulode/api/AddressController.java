@@ -4,9 +4,7 @@ import com.enzulode.dto.AddressMutationDto;
 import com.enzulode.dto.AddressReadDto;
 import com.enzulode.service.AddressService;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,20 +25,8 @@ public class AddressController {
   }
 
   @GetMapping
-  public Page<AddressReadDto> readEndpoint(
-      @RequestParam("page") int pageNum,
-      @RequestParam("pageSize") int pageSize,
-      @RequestParam(name = "sort", required = false, defaultValue = "") String sortBy,
-      @RequestParam(name = "order", required = false, defaultValue = "asc") String order) {
-    if (sortBy != null && !sortBy.isBlank()) {
-      Sort.Direction dir = Sort.Direction.fromString(order);
-      Sort sort = Sort.by(dir, sortBy);
-      Pageable page = PageRequest.of(pageNum, pageSize, sort);
-      return addressService.findAll(page);
-    }
-
-    Pageable page = PageRequest.of(pageNum, pageSize);
-    return addressService.findAll(page);
+  public Page<AddressReadDto> readEndpoint(Pageable pageable) {
+    return addressService.findAll(pageable);
   }
 
   @PatchMapping("/{id}")
