@@ -1,0 +1,22 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: zipkin-server
+  namespace: zipkin
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: zipkin.localdev
+      http:
+        paths:
+          - backend:
+              service:
+                name: zipkin
+                port:
+                  name: http
+            path: /
+            pathType: ImplementationSpecific
+  tls:
+    - hosts:
+        - zipkin.localdev
+      secretName: zipkin-server-localdev-tls
