@@ -6,6 +6,10 @@ public class UnauthorizedOperationException extends RuntimeException {
 
   @Serial private static final long serialVersionUID = -524412312123L;
 
+  public UnauthorizedOperationException() {
+    super("Unauthorized operation");
+  }
+
   public UnauthorizedOperationException(String message) {
     super(message);
   }

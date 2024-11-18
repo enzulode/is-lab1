@@ -6,6 +6,10 @@ public class LocationNotFoundException extends RuntimeException {
 
   @Serial private static final long serialVersionUID = -463573624L;
 
+  public LocationNotFoundException() {
+    super("Location not found");
+  }
+
   public LocationNotFoundException(String message) {
     super(message);
   }
