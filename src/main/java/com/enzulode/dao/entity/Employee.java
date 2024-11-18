@@ -3,7 +3,9 @@ package com.enzulode.dao.entity;
 import com.enzulode.dao.entity.common.BusinessEntity;
 import jakarta.persistence.*;
 import java.time.LocalDate;
+import java.util.LinkedHashSet;
 import java.util.Objects;
+import java.util.Set;
 import org.hibernate.proxy.HibernateProxy;
 
 @Entity
@@ -21,6 +23,13 @@ public class Employee extends BusinessEntity {
   private String middleName;
 
   private LocalDate birthDate;
+
+  @ManyToMany(cascade = {CascadeType.MERGE})
+  @JoinTable(
+      name = "employee_organizations",
+      joinColumns = @JoinColumn(name = "employee_id"),
+      inverseJoinColumns = @JoinColumn(name = "organizations_id"))
+  private Set<Organization> organizations = new LinkedHashSet<>();
 
   public Employee() {}
 
@@ -69,6 +78,14 @@ public class Employee extends BusinessEntity {
 
   public void setBirthDate(LocalDate birthDate) {
     this.birthDate = birthDate;
+  }
+
+  public Set<Organization> getOrganizations() {
+    return organizations;
+  }
+
+  public void setOrganizations(Set<Organization> organizations) {
+    this.organizations = organizations;
   }
 
   @Override
