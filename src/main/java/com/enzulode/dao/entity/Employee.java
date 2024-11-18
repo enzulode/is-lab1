@@ -2,7 +2,7 @@ package com.enzulode.dao.entity;
 
 import com.enzulode.dao.entity.common.BusinessEntity;
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.Objects;
 import org.hibernate.proxy.HibernateProxy;
 
@@ -20,11 +20,11 @@ public class Employee extends BusinessEntity {
 
   private String middleName;
 
-  private LocalDateTime birthDate;
+  private LocalDate birthDate;
 
   public Employee() {}
 
-  public Employee(String firstName, String lastName, String middleName, LocalDateTime birthDate) {
+  public Employee(String firstName, String lastName, String middleName, LocalDate birthDate) {
     this.firstName = firstName;
     this.lastName = lastName;
     this.middleName = middleName;
@@ -63,11 +63,11 @@ public class Employee extends BusinessEntity {
     this.middleName = middleName;
   }
 
-  public LocalDateTime getBirthDate() {
+  public LocalDate getBirthDate() {
     return birthDate;
   }
 
-  public void setBirthDate(LocalDateTime birthDate) {
+  public void setBirthDate(LocalDate birthDate) {
     this.birthDate = birthDate;
   }
 

@@ -10,7 +10,7 @@ CREATE TABLE employee
     first_name  VARCHAR(255),
     last_name   VARCHAR(255),
     middle_name VARCHAR(255),
-    birth_date  TIMESTAMP WITHOUT TIME ZONE,
+    birth_date  date,
 
     CONSTRAINT pk_employee PRIMARY KEY (id)
 );
