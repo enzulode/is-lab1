@@ -24,7 +24,7 @@ public class Employee extends BusinessEntity {
 
   private LocalDate birthDate;
 
-  @ManyToMany(cascade = {CascadeType.MERGE})
+  @ManyToMany(fetch = FetchType.EAGER)
   @JoinTable(
       name = "employee_organizations",
       joinColumns = @JoinColumn(name = "employee_id"),

@@ -10,6 +10,7 @@ import com.enzulode.service.EmployeeService;
 import com.enzulode.util.PatchUtil;
 import com.enzulode.util.SecurityContextHelper;
 import com.fasterxml.jackson.databind.JsonNode;
+import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -57,7 +58,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         .findByIdAndCreatedBy(id, contextHelper.findUserName())
         .orElseThrow(EmployeeNotFoundException::new);
 
-    Employee patchedEmployee = patchUtil.applyPatch(employee, patchNode);
+    Employee patchedEmployee = patchUtil.applyPatchPreserve(employee, patchNode, List.of("organizations"));
     Employee patchResult = employeeRepository.save(patchedEmployee);
 
     return employeeMapper.toReadDto(patchResult);
