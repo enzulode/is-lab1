@@ -49,4 +49,12 @@ public class Coordinates extends BusinessEntity {
   public void setY(int y) {
     this.y = y;
   }
+
+  public Collection<Organization> getOrganizations() {
+    return organizations;
+  }
+
+  public void setOrganizations(Collection<Organization> organizations) {
+    this.organizations = organizations;
+  }
 }

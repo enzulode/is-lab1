@@ -1,8 +1,9 @@
 package com.enzulode.api;
 
-import com.enzulode.dto.CoordinatesMutationDto;
+import com.enzulode.dto.CoordinatesCreateDto;
 import com.enzulode.dto.CoordinatesReadDto;
 import com.enzulode.service.CoordinatesService;
+import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -20,8 +21,8 @@ public class CoordinatesController {
 
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
-  public CoordinatesReadDto createEndpoint(@RequestBody CoordinatesMutationDto mutationDto) {
-    return coordinatesService.create(mutationDto);
+  public CoordinatesReadDto createEndpoint(@RequestBody CoordinatesCreateDto createDto) {
+    return coordinatesService.create(createDto);
   }
 
   @GetMapping
@@ -30,9 +31,8 @@ public class CoordinatesController {
   }
 
   @PatchMapping("/{id}")
-  public CoordinatesReadDto updateEndpoint(
-      @PathVariable Long id, @RequestBody CoordinatesMutationDto mutationDto) {
-    return coordinatesService.update(id, mutationDto);
+  public CoordinatesReadDto updateEndpoint(@PathVariable Long id, @RequestBody JsonNode patchNode) {
+    return coordinatesService.update(id, patchNode);
   }
 
   @DeleteMapping("/{id}")
