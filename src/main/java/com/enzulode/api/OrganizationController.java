@@ -1,8 +1,9 @@
 package com.enzulode.api;
 
-import com.enzulode.dto.OrganizationMutationDto;
+import com.enzulode.dto.OrganizationCreateDto;
 import com.enzulode.dto.OrganizationReadDto;
 import com.enzulode.service.OrganizationService;
+import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -20,7 +21,7 @@ public class OrganizationController {
 
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
-  public OrganizationReadDto createEndpoint(@RequestBody OrganizationMutationDto mutationDto) {
+  public OrganizationReadDto createEndpoint(@RequestBody OrganizationCreateDto mutationDto) {
     return organizationService.create(mutationDto);
   }
 
@@ -31,8 +32,8 @@ public class OrganizationController {
 
   @PatchMapping("/{id}")
   public OrganizationReadDto updateEndpoint(
-      @PathVariable Integer id, @RequestBody OrganizationMutationDto mutationDto) {
-    return organizationService.update(id, mutationDto);
+      @PathVariable Integer id, @RequestBody JsonNode patchNode) {
+    return organizationService.update(id, patchNode);
   }
 
   @DeleteMapping("/{id}")

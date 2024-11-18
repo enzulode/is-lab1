@@ -4,7 +4,7 @@ import com.enzulode.dao.entity.OrganizationType;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDateTime;
 
-public record OrganizationMutationDto(
+public record OrganizationCreateDto(
     // formatter:off
     String name,
     Long coordinatesId,

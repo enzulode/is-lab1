@@ -1,6 +1,7 @@
 package com.enzulode.dao.entity;
 
 import com.enzulode.dao.entity.common.BusinessEntity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -17,6 +18,7 @@ public class Coordinates extends BusinessEntity {
   private int y;
 
   @OneToMany(mappedBy = "coordinates")
+  @JsonIgnore
   private Collection<Organization> organizations = new ArrayList<>();
 
   public Coordinates() {}
