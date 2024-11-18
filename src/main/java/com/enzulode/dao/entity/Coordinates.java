@@ -12,7 +12,8 @@ import org.hibernate.proxy.HibernateProxy;
 public class Coordinates extends BusinessEntity {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "coordinates_seq")
+  @SequenceGenerator(name = "coordinates_seq")
   private Long id;
 
   private Float x;

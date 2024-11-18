@@ -28,6 +28,9 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-validation")
     runtimeOnly("org.postgresql:postgresql")
 
+    implementation("org.flywaydb:flyway-core")
+    runtimeOnly("org.flywaydb:flyway-database-postgresql")
+
     implementation("com.jayway.jsonpath:json-path")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
 

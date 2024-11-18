@@ -1,10 +1,7 @@
 package com.enzulode.dao.entity;
 
 import com.enzulode.dao.entity.common.BusinessEntity;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import java.util.Objects;
 import org.hibernate.proxy.HibernateProxy;
 
@@ -12,7 +9,8 @@ import org.hibernate.proxy.HibernateProxy;
 public class Location extends BusinessEntity {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "location_seq")
+  @SequenceGenerator(name = "location_seq")
   private Long id;
 
   private Float x;

@@ -44,6 +44,8 @@ public abstract class BusinessEntity {
   public void defineCreatedByAndCreatedAt() {
     createdAt = LocalDateTime.now();
     createdBy = findUserName();
+    modifiedAt = createdAt;
+    modifiedBy = createdBy;
   }
 
   @PreUpdate

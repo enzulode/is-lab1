@@ -12,7 +12,8 @@ import org.hibernate.proxy.HibernateProxy;
 public class Address extends BusinessEntity {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "address_seq")
+  @SequenceGenerator(name = "address_seq")
   private Long id;
 
   private String street;

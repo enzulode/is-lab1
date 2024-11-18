@@ -10,7 +10,8 @@ import org.hibernate.proxy.HibernateProxy;
 public class Organization extends BusinessEntity {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "organization_seq")
+  @SequenceGenerator(name = "organization_seq")
   private Integer id;
 
   private String name;
