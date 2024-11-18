@@ -14,5 +14,11 @@ public interface OrganizationService {
 
   OrganizationReadDto update(Integer id, JsonNode patchNode);
 
+  OrganizationReadDto updateCoordinates(Integer organizationId, Long coordinatesId);
+
+  OrganizationReadDto updateOfficialAddress(Integer organizationId, Long officialAddressId);
+
+  OrganizationReadDto updatePostalAddress(Integer organizationId, Long postalAddressId);
+
   void delete(Long id);
 }

@@ -47,12 +47,17 @@ public class OrganizationServiceImpl implements OrganizationService {
   @Transactional
   public OrganizationReadDto create(OrganizationCreateDto createDto) {
     // formatter:off
-    Coordinates existingCoordinates = coordinatesRepository.findByIdAndCreatedBy(createDto.coordinatesId(), contextHelper.findUserName())
-        .orElseThrow(() -> new CoordinatesNotFoundException("Failed to create organization: coordinates not found"));
-    Address existingOfficialAddress = addressRepository.findByIdAndCreatedBy(createDto.officialAddressId(), contextHelper.findUserName())
-        .orElseThrow(() -> new AddressNotFoundException("Failed to create organization: official address not found"));
-    Address existingPostalAddress = addressRepository.findByIdAndCreatedBy(createDto.postalAddressId(), contextHelper.findUserName())
-        .orElseThrow(() -> new AddressNotFoundException("Failed to create organization: postal address not found"));
+    Coordinates existingCoordinates = coordinatesRepository
+        .findByIdAndCreatedBy(createDto.coordinatesId(), contextHelper.findUserName())
+        .orElseThrow(CoordinatesNotFoundException::new);
+
+    Address existingOfficialAddress = addressRepository
+        .findByIdAndCreatedBy(createDto.officialAddressId(), contextHelper.findUserName())
+        .orElseThrow(AddressNotFoundException::new);
+
+    Address existingPostalAddress = addressRepository
+        .findByIdAndCreatedBy(createDto.postalAddressId(), contextHelper.findUserName())
+        .orElseThrow(AddressNotFoundException::new);
 
     Organization organization = organizationMapper.toEntity(createDto);
     organization.setCoordinates(existingCoordinates);
@@ -73,13 +78,71 @@ public class OrganizationServiceImpl implements OrganizationService {
   @Transactional
   public OrganizationReadDto update(Integer id, JsonNode patchNode) {
     // formatter:off
-    Organization organization = organizationRepository.findByIdAndCreatedBy(id, contextHelper.findUserName())
-        .orElseThrow(() -> new OrganizationNotFoundException("Failed to update organization: organization not found"));
+    Organization organization = organizationRepository
+        .findByIdAndCreatedBy(id, contextHelper.findUserName())
+        .orElseThrow(OrganizationNotFoundException::new);
 
     Organization patchedOrganization = patchUtil.applyPatch(organization, patchNode);
     Organization patchedResult = organizationRepository.save(patchedOrganization);
 
     return organizationMapper.toReadDto(patchedResult);
+    // formatter:on
+  }
+
+  @Override
+  @Transactional
+  public OrganizationReadDto updateCoordinates(Integer organizationId, Long coordinatesId) {
+    // formatter:off
+    Organization organization = organizationRepository
+        .findByIdAndCreatedBy(organizationId, contextHelper.findUserName())
+        .orElseThrow(OrganizationNotFoundException::new);
+
+    Coordinates coordinates = coordinatesRepository
+        .findByIdAndCreatedBy(coordinatesId, contextHelper.findUserName())
+        .orElseThrow(CoordinatesNotFoundException::new);
+
+    organization.setCoordinates(coordinates);
+    Organization updatedOrganization = organizationRepository.save(organization);
+
+    return organizationMapper.toReadDto(updatedOrganization);
+    // formatter:on
+  }
+
+  @Override
+  @Transactional
+  public OrganizationReadDto updateOfficialAddress(Integer organizationId, Long officialAddressId) {
+    // formatter:off
+    Organization organization = organizationRepository
+        .findByIdAndCreatedBy(organizationId, contextHelper.findUserName())
+        .orElseThrow(OrganizationNotFoundException::new);
+
+    Address address = addressRepository
+        .findByIdAndCreatedBy(officialAddressId, contextHelper.findUserName())
+        .orElseThrow(AddressNotFoundException::new);
+
+    organization.setOfficialAddress(address);
+    Organization updatedOrganization = organizationRepository.save(organization);
+
+    return organizationMapper.toReadDto(updatedOrganization);
+    // formatter:on
+  }
+
+  @Override
+  @Transactional
+  public OrganizationReadDto updatePostalAddress(Integer organizationId, Long postalAddressId) {
+    // formatter:off
+    Organization organization = organizationRepository
+        .findByIdAndCreatedBy(organizationId, contextHelper.findUserName())
+        .orElseThrow(OrganizationNotFoundException::new);
+
+    Address address = addressRepository
+        .findByIdAndCreatedBy(postalAddressId, contextHelper.findUserName())
+        .orElseThrow(AddressNotFoundException::new);
+
+    organization.setPostalAddress(address);
+    Organization updatedOrganization = organizationRepository.save(organization);
+
+    return organizationMapper.toReadDto(updatedOrganization);
     // formatter:on
   }
 

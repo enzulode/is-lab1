@@ -36,6 +36,24 @@ public class OrganizationController {
     return organizationService.update(id, patchNode);
   }
 
+  @PatchMapping("/{organizationId}/coordinates/{coordinatesId}")
+  public OrganizationReadDto updateOrganizationCoordinatesEndpoint(
+      @PathVariable Integer organizationId, @PathVariable Long coordinatesId) {
+    return organizationService.updateCoordinates(organizationId, coordinatesId);
+  }
+
+  @PatchMapping("/{organizationId}/address/official/{addressId}")
+  public OrganizationReadDto updateOrganizationOfficialAddressEndpoint(
+      @PathVariable Integer organizationId, @PathVariable Long addressId) {
+    return organizationService.updateOfficialAddress(organizationId, addressId);
+  }
+
+  @PatchMapping("/{organizationId}/address/postal/{addressId}")
+  public OrganizationReadDto updateOrganizationPostalAddressEndpoint(
+      @PathVariable Integer organizationId, @PathVariable Long addressId) {
+    return organizationService.updatePostalAddress(organizationId, addressId);
+  }
+
   @DeleteMapping("/{id}")
   public void deleteEndpoint(@PathVariable Long id) {
     organizationService.delete(id);
