@@ -14,7 +14,7 @@ public class Address extends BusinessEntity {
 
   private String street;
 
-  @OneToOne(optional = false, fetch = FetchType.EAGER)
+  @OneToOne(optional = false, fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
   private Location town;
 
   @OneToMany(mappedBy = "officialAddress")

@@ -4,12 +4,15 @@ import com.enzulode.dao.entity.Address;
 import com.enzulode.dao.entity.Location;
 import com.enzulode.dao.repository.AddressRepository;
 import com.enzulode.dao.repository.LocationRepository;
-import com.enzulode.dto.AddressMutationDto;
+import com.enzulode.dto.AddressCreateDto;
 import com.enzulode.dto.AddressReadDto;
+import com.enzulode.dto.mapper.AddressMapper;
 import com.enzulode.exception.AddressNotFoundException;
 import com.enzulode.exception.LocationNotFoundException;
 import com.enzulode.service.AddressService;
+import com.enzulode.util.PatchUtil;
 import com.enzulode.util.SecurityContextHelper;
+import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -21,48 +24,51 @@ public class AddressServiceImpl implements AddressService {
   private final LocationRepository locationRepository;
   private final AddressRepository addressRepository;
   private final SecurityContextHelper contextHelper;
+  private final AddressMapper addressMapper;
+  private final PatchUtil patchUtil;
 
   public AddressServiceImpl(
       LocationRepository locationRepository,
       AddressRepository addressRepository,
-      SecurityContextHelper contextHelper) {
+      SecurityContextHelper contextHelper,
+      AddressMapper addressMapper,
+      PatchUtil patchUtil) {
     this.locationRepository = locationRepository;
     this.addressRepository = addressRepository;
     this.contextHelper = contextHelper;
+    this.addressMapper = addressMapper;
+    this.patchUtil = patchUtil;
   }
 
   @Override
   @Transactional
-  public AddressReadDto create(AddressMutationDto data) {
+  public AddressReadDto create(AddressCreateDto createDto) {
     // formatter:off
-    Location existingTown = locationRepository.findByIdAndCreatedBy(data.townId(), contextHelper.findUserName())
+    Location existingTown = locationRepository.findByIdAndCreatedBy(createDto.townId(), contextHelper.findUserName())
         .orElseThrow(() -> new LocationNotFoundException("Failed to create address: town not found"));
-    Address newAddress = new Address(data.street(), existingTown);
-    Address result = addressRepository.save(newAddress);
-    return AddressReadDto.toReadDtoForRead(result);
+
+    Address address = addressMapper.toEntity(createDto);
+    address.setTown(existingTown);
+    Address result = addressRepository.save(address);
+    return addressMapper.toReadDto(result);
     // formatter:on
   }
 
   @Override
   public Page<AddressReadDto> findAll(Pageable pageable) {
-    return addressRepository.findAll(pageable).map(AddressReadDto::toReadDtoForRead);
+    return addressRepository.findAll(pageable).map(addressMapper::toReadDto);
   }
 
   @Override
   @Transactional
-  public AddressReadDto update(Long id, AddressMutationDto data) {
+  public AddressReadDto update(Long id, JsonNode patchNode) {
     // formatter:off
-    Location newTown = locationRepository.findByIdAndCreatedBy(data.townId(), contextHelper.findUserName())
-            .orElseThrow(() -> new LocationNotFoundException("Failed to update address: new town was not found"));
-    Address existingAddressWithUpdatedFields = addressRepository.findByIdAndCreatedBy(id, contextHelper.findUserName())
-        .map(address -> {
-          address.setStreet(data.street());
-          address.setTown(newTown);
-          return address;
-        })
+    Address address = addressRepository.findByIdAndCreatedBy(id, contextHelper.findUserName())
         .orElseThrow(() -> new AddressNotFoundException("Unable to update address: the old one not found"));
-    Address updatedAddress = addressRepository.save(existingAddressWithUpdatedFields);
-    return AddressReadDto.toReadDtoForRead(updatedAddress);
+
+    Address patchedAddress = patchUtil.applyPatch(address, patchNode);
+    Address patchedResult = addressRepository.save(patchedAddress);
+    return addressMapper.toReadDto(patchedResult);
     // formatter:on
   }
 
