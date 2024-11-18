@@ -11,6 +11,7 @@ import org.mapstruct.MappingConstants;
 public interface EmployeeMapper {
 
   @Mapping(target = "id", ignore = true)
+  @Mapping(target = "organizations", ignore = true)
   Employee toEntity(EmployeeCreateDto createDto);
 
   EmployeeReadDto toReadDto(Employee employee);
