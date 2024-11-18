@@ -1,7 +1,7 @@
 plugins {
     id("is-lab1.java-conventions")
-    alias(libs.plugins.springBootGradlePlugin)
-    alias(libs.plugins.springBootDependencyManagementGradlePlugin)
+    alias(libs.plugins.springBoot)
+    alias(libs.plugins.springBootDependencyManagement)
 }
 
 group = "com.enzulode"
@@ -31,8 +31,8 @@ dependencies {
     implementation("com.jayway.jsonpath:json-path")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
 
-    implementation("org.mapstruct:mapstruct:1.6.3")
-    annotationProcessor("org.mapstruct:mapstruct-processor:1.6.3")
+    implementation("org.mapstruct:mapstruct:${libs.versions.mapstruct.get()}")
+    annotationProcessor("org.mapstruct:mapstruct-processor:${libs.versions.mapstruct.get()}")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
