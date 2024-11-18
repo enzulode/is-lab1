@@ -1,8 +1,9 @@
 package com.enzulode.api;
 
-import com.enzulode.dto.LocationMutationDto;
+import com.enzulode.dto.LocationCreateDto;
 import com.enzulode.dto.LocationReadDto;
 import com.enzulode.service.LocationService;
+import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -20,7 +21,7 @@ public class LocationController {
 
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
-  public LocationReadDto createEndpoint(@RequestBody LocationMutationDto mutationDto) {
+  public LocationReadDto createEndpoint(@RequestBody LocationCreateDto mutationDto) {
     return locationService.create(mutationDto);
   }
 
@@ -30,9 +31,8 @@ public class LocationController {
   }
 
   @PatchMapping("/{id}")
-  public LocationReadDto updateEndpoint(
-      @PathVariable Long id, @RequestBody LocationMutationDto mutationDto) {
-    return locationService.update(id, mutationDto);
+  public LocationReadDto updateEndpoint(@PathVariable Long id, @RequestBody JsonNode patchNode) {
+    return locationService.update(id, patchNode);
   }
 
   @DeleteMapping("/{id}")
