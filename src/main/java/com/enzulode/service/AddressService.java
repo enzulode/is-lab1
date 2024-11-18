@@ -14,5 +14,7 @@ public interface AddressService {
 
   AddressReadDto update(Long id, JsonNode patchNode);
 
+  AddressReadDto updateTown(Long addressId, Long townId);
+
   void delete(Long id);
 }

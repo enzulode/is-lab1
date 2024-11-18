@@ -35,6 +35,11 @@ public class AddressController {
     return addressService.update(id, patchNode);
   }
 
+  @PatchMapping("/{addressId}/town/{townId}")
+  public AddressReadDto updateAddressTown(@PathVariable Long addressId, @PathVariable Long townId) {
+    return addressService.updateTown(addressId, townId);
+  }
+
   @DeleteMapping("/{id}")
   public void deleteEndpoint(@PathVariable Long id) {
     addressService.delete(id);

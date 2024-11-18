@@ -74,6 +74,22 @@ public class AddressServiceImpl implements AddressService {
 
   @Override
   @Transactional
+  public AddressReadDto updateTown(Long addressId, Long townId) {
+    // formatter:off
+    Address address = addressRepository.findByIdAndCreatedBy(addressId, contextHelper.findUserName())
+        .orElseThrow(() -> new AddressNotFoundException("Unable to update address: address not found"));
+    Location town = locationRepository.findByIdAndCreatedBy(townId, contextHelper.findUserName())
+        .orElseThrow(() -> new LocationNotFoundException("Unable to update address town: new town not found"));
+
+    address.setTown(town);
+    Address updatedAddress = addressRepository.save(address);
+
+    return addressMapper.toReadDto(updatedAddress);
+    // formatter:on
+  }
+
+  @Override
+  @Transactional
   public void delete(Long id) {
     addressRepository.deleteByIdAndCreatedBy(id, contextHelper.findUserName());
   }
