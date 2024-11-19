@@ -16,13 +16,13 @@ public class Organization extends BusinessEntity {
 
   private String name;
 
-  @ManyToOne(cascade = CascadeType.MERGE)
+  @ManyToOne
   @JoinColumn(name = "coordinates_id")
   private Coordinates coordinates;
 
   private LocalDateTime creationDate;
 
-  @ManyToOne(cascade = CascadeType.MERGE)
+  @ManyToOne
   @JoinColumn(name = "official_address_id")
   private Address officialAddress;
 
@@ -37,7 +37,7 @@ public class Organization extends BusinessEntity {
   @Enumerated(EnumType.STRING)
   private OrganizationType type;
 
-  @ManyToOne(cascade = CascadeType.MERGE)
+  @ManyToOne
   @JoinColumn(name = "postal_address_id")
   private Address postalAddress;
 

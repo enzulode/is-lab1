@@ -13,6 +13,7 @@ import com.enzulode.service.OrganizationService;
 import com.enzulode.util.PatchUtil;
 import com.enzulode.util.SecurityContextHelper;
 import com.fasterxml.jackson.databind.JsonNode;
+import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -82,7 +83,8 @@ public class OrganizationServiceImpl implements OrganizationService {
         .findByIdAndCreatedBy(id, contextHelper.findUserName())
         .orElseThrow(OrganizationNotFoundException::new);
 
-    Organization patchedOrganization = patchUtil.applyPatch(organization, patchNode);
+    List<String> preserve = List.of("coordinates", "officialAddress", "postalAddress");
+    Organization patchedOrganization = patchUtil.applyPatchPreserve(organization, patchNode, preserve);
     Organization patchedResult = organizationRepository.save(patchedOrganization);
 
     return organizationMapper.toReadDto(patchedResult);
