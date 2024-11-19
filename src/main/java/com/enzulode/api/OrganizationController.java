@@ -2,6 +2,7 @@ package com.enzulode.api;
 
 import com.enzulode.dto.OrganizationCreateDto;
 import com.enzulode.dto.OrganizationReadDto;
+import com.enzulode.dto.OrganizationsTotalRatingDto;
 import com.enzulode.service.OrganizationService;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.data.domain.Page;
@@ -57,5 +58,10 @@ public class OrganizationController {
   @DeleteMapping("/{id}")
   public void deleteEndpoint(@PathVariable Integer id) {
     organizationService.delete(id);
+  }
+
+  @GetMapping("/rating/total")
+  public OrganizationsTotalRatingDto totalRatingEndpoint() {
+    return organizationService.totalRating();
   }
 }

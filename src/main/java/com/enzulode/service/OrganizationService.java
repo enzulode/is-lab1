@@ -2,6 +2,7 @@ package com.enzulode.service;
 
 import com.enzulode.dto.OrganizationCreateDto;
 import com.enzulode.dto.OrganizationReadDto;
+import com.enzulode.dto.OrganizationsTotalRatingDto;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,4 +22,6 @@ public interface OrganizationService {
   OrganizationReadDto updatePostalAddress(Integer organizationId, Long postalAddressId);
 
   void delete(Integer id);
+
+  OrganizationsTotalRatingDto totalRating();
 }

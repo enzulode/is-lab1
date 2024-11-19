@@ -153,4 +153,9 @@ public class OrganizationServiceImpl implements OrganizationService {
   public void delete(Integer id) {
     organizationRepository.deleteByIdAndCreatedBy(id, contextHelper.findUserName());
   }
+
+  @Override
+  public OrganizationsTotalRatingDto totalRating() {
+    return new OrganizationsTotalRatingDto(organizationRepository.totalRating());
+  }
 }
