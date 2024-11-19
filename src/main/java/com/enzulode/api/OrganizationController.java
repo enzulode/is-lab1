@@ -1,9 +1,6 @@
 package com.enzulode.api;
 
-import com.enzulode.dto.CountOrganizationFullNameLessThanDto;
-import com.enzulode.dto.OrganizationCreateDto;
-import com.enzulode.dto.OrganizationReadDto;
-import com.enzulode.dto.OrganizationsTotalRatingDto;
+import com.enzulode.dto.*;
 import com.enzulode.service.OrganizationService;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.data.domain.Page;
@@ -70,5 +67,11 @@ public class OrganizationController {
   public CountOrganizationFullNameLessThanDto countOrganizationsFullNameLessThanEndpoint(
       @RequestParam("name") String name) {
     return organizationService.countOrganizationFullNameLessThan(name);
+  }
+
+  @GetMapping("/name/more")
+  public CountOrganizationFullNameMoreThanDto countOrganizationFullNameMoreThanEndpoint(
+      @RequestParam("name") String name) {
+    return organizationService.countOrganizationFullNameMoreThan(name);
   }
 }

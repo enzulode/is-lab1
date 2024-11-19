@@ -1,9 +1,6 @@
 package com.enzulode.service;
 
-import com.enzulode.dto.CountOrganizationFullNameLessThanDto;
-import com.enzulode.dto.OrganizationCreateDto;
-import com.enzulode.dto.OrganizationReadDto;
-import com.enzulode.dto.OrganizationsTotalRatingDto;
+import com.enzulode.dto.*;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,4 +24,6 @@ public interface OrganizationService {
   OrganizationsTotalRatingDto totalRating();
 
   CountOrganizationFullNameLessThanDto countOrganizationFullNameLessThan(String fullName);
+
+  CountOrganizationFullNameMoreThanDto countOrganizationFullNameMoreThan(String fullName);
 }

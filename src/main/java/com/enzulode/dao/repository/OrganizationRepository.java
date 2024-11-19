@@ -19,4 +19,7 @@ public interface OrganizationRepository extends JpaRepository<Organization, Inte
 
   @Query("select count_organization_full_name_less_than(:c_full_name)")
   int countOrganizationFullNameLessThan(@Param("c_full_name") String fullName);
+
+  @Query("select count_organization_full_name_more_than(:c_full_name)")
+  int countOrganizationFullNameMoreThan(@Param("c_full_name") String fullName);
 }

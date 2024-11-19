@@ -164,4 +164,10 @@ public class OrganizationServiceImpl implements OrganizationService {
     return new CountOrganizationFullNameLessThanDto(
         organizationRepository.countOrganizationFullNameLessThan(fullName));
   }
+
+  @Override
+  public CountOrganizationFullNameMoreThanDto countOrganizationFullNameMoreThan(String fullName) {
+    return new CountOrganizationFullNameMoreThanDto(
+        organizationRepository.countOrganizationFullNameMoreThan(fullName));
+  }
 }
