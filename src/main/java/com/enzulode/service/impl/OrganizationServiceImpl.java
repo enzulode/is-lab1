@@ -170,4 +170,16 @@ public class OrganizationServiceImpl implements OrganizationService {
     return new CountOrganizationFullNameMoreThanDto(
         organizationRepository.countOrganizationFullNameMoreThan(fullName));
   }
+
+  @Override
+  @Transactional
+  public void removeAllEmployeesOnOrganization(Integer organizationId) {
+    organizationRepository.removeAllEmployeesOnOrganization(organizationId);
+  }
+
+  @Override
+  @Transactional
+  public void hireEmployeeToOrganization(Integer organizationId, Long employeeId) {
+    organizationRepository.hireEmployeeToOrganization(organizationId, employeeId);
+  }
 }

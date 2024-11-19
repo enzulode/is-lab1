@@ -22,4 +22,11 @@ public interface OrganizationRepository extends JpaRepository<Organization, Inte
 
   @Query("select count_organization_full_name_more_than(:c_full_name)")
   int countOrganizationFullNameMoreThan(@Param("c_full_name") String fullName);
+
+  @Query("select remove_all_employees_on_organization(:org_id)")
+  void removeAllEmployeesOnOrganization(@Param("org_id") Integer organizationId);
+
+  @Query("select hire_employee_to_organization(:org_id, :e_id)")
+  void hireEmployeeToOrganization(
+      @Param("org_id") Integer organizationId, @Param("e_id") Long employeeId);
 }

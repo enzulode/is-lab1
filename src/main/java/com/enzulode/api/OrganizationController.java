@@ -74,4 +74,15 @@ public class OrganizationController {
       @RequestParam("name") String name) {
     return organizationService.countOrganizationFullNameMoreThan(name);
   }
+
+  @DeleteMapping("/{id}/employees")
+  public void removeEmployeesEndpoint(@PathVariable Integer id) {
+    organizationService.removeAllEmployeesOnOrganization(id);
+  }
+
+  @PatchMapping("/{organizationId}/hire/{employeeId}")
+  public void hireEmployeeEndpoint(
+      @PathVariable Integer organizationId, @PathVariable Long employeeId) {
+    organizationService.hireEmployeeToOrganization(organizationId, employeeId);
+  }
 }

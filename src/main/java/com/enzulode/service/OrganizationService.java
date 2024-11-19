@@ -26,4 +26,8 @@ public interface OrganizationService {
   CountOrganizationFullNameLessThanDto countOrganizationFullNameLessThan(String fullName);
 
   CountOrganizationFullNameMoreThanDto countOrganizationFullNameMoreThan(String fullName);
+
+  void removeAllEmployeesOnOrganization(Integer organizationId);
+
+  void hireEmployeeToOrganization(Integer organizationId, Long employeeId);
 }
