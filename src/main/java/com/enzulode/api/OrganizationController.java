@@ -55,7 +55,7 @@ public class OrganizationController {
   }
 
   @DeleteMapping("/{id}")
-  public void deleteEndpoint(@PathVariable Long id) {
+  public void deleteEndpoint(@PathVariable Integer id) {
     organizationService.delete(id);
   }
 }

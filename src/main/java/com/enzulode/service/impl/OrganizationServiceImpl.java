@@ -150,7 +150,7 @@ public class OrganizationServiceImpl implements OrganizationService {
 
   @Override
   @Transactional
-  public void delete(Long id) {
+  public void delete(Integer id) {
     organizationRepository.deleteByIdAndCreatedBy(id, contextHelper.findUserName());
   }
 }

@@ -10,5 +10,5 @@ public interface OrganizationRepository extends JpaRepository<Organization, Inte
 
   Optional<Organization> findByIdAndCreatedBy(Integer id, String username);
 
-  void deleteByIdAndCreatedBy(Long id, String username);
+  void deleteByIdAndCreatedBy(Integer id, String username);
 }

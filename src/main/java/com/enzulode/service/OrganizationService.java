@@ -20,5 +20,5 @@ public interface OrganizationService {
 
   OrganizationReadDto updatePostalAddress(Integer organizationId, Long postalAddressId);
 
-  void delete(Long id);
+  void delete(Integer id);
 }
