@@ -13,6 +13,7 @@ import com.enzulode.service.AddressService;
 import com.enzulode.util.PatchUtil;
 import com.enzulode.util.SecurityContextHelper;
 import com.fasterxml.jackson.databind.JsonNode;
+import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -66,8 +67,9 @@ public class AddressServiceImpl implements AddressService {
     Address address = addressRepository.findByIdAndCreatedBy(id, contextHelper.findUserName())
         .orElseThrow(() -> new AddressNotFoundException("Unable to update address: the old one not found"));
 
-    Address patchedAddress = patchUtil.applyPatch(address, patchNode);
+    Address patchedAddress = patchUtil.applyPatchPreserve(address, patchNode, List.of("town"));
     Address patchedResult = addressRepository.save(patchedAddress);
+
     return addressMapper.toReadDto(patchedResult);
     // formatter:on
   }
