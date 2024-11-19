@@ -1,5 +1,6 @@
 package com.enzulode.service;
 
+import com.enzulode.dto.CountOrganizationFullNameLessThanDto;
 import com.enzulode.dto.OrganizationCreateDto;
 import com.enzulode.dto.OrganizationReadDto;
 import com.enzulode.dto.OrganizationsTotalRatingDto;
@@ -24,4 +25,6 @@ public interface OrganizationService {
   void delete(Integer id);
 
   OrganizationsTotalRatingDto totalRating();
+
+  CountOrganizationFullNameLessThanDto countOrganizationFullNameLessThan(String fullName);
 }

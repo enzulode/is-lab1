@@ -158,4 +158,10 @@ public class OrganizationServiceImpl implements OrganizationService {
   public OrganizationsTotalRatingDto totalRating() {
     return new OrganizationsTotalRatingDto(organizationRepository.totalRating());
   }
+
+  @Override
+  public CountOrganizationFullNameLessThanDto countOrganizationFullNameLessThan(String fullName) {
+    return new CountOrganizationFullNameLessThanDto(
+        organizationRepository.countOrganizationFullNameLessThan(fullName));
+  }
 }

@@ -1,5 +1,6 @@
 package com.enzulode.api;
 
+import com.enzulode.dto.CountOrganizationFullNameLessThanDto;
 import com.enzulode.dto.OrganizationCreateDto;
 import com.enzulode.dto.OrganizationReadDto;
 import com.enzulode.dto.OrganizationsTotalRatingDto;
@@ -63,5 +64,11 @@ public class OrganizationController {
   @GetMapping("/rating/total")
   public OrganizationsTotalRatingDto totalRatingEndpoint() {
     return organizationService.totalRating();
+  }
+
+  @GetMapping("/name/less")
+  public CountOrganizationFullNameLessThanDto countOrganizationsFullNameLessThanEndpoint(
+      @RequestParam("name") String name) {
+    return organizationService.countOrganizationFullNameLessThan(name);
   }
 }
