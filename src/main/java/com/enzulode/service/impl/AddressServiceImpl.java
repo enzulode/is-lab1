@@ -45,27 +45,53 @@ public class AddressServiceImpl implements AddressService {
   @Transactional
   public AddressReadDto create(AddressCreateDto createDto) {
     // formatter:off
-    Location existingTown = locationRepository.findByIdAndCreatedBy(createDto.townId(), contextHelper.findUserName())
-        .orElseThrow(() -> new LocationNotFoundException("Failed to create address: town not found"));
+    Location existingTown;
+    if (contextHelper.isAdmin()) {
+      existingTown =
+          locationRepository
+              .findById(createDto.townId())
+              .orElseThrow(LocationNotFoundException::new);
+    } else {
+      existingTown =
+          locationRepository
+              .findByIdAndCreatedBy(createDto.townId(), contextHelper.findUserName())
+              .orElseThrow(LocationNotFoundException::new);
+    }
 
     Address address = addressMapper.toEntity(createDto);
     address.setTown(existingTown);
     Address result = addressRepository.save(address);
+
     return addressMapper.toReadDto(result);
     // formatter:on
   }
 
   @Override
   public Page<AddressReadDto> findAll(Pageable pageable) {
-    return addressRepository.findAll(pageable).map(addressMapper::toReadDto);
+    if (contextHelper.isAdmin()) {
+      return addressRepository.findAll(pageable).map(addressMapper::toReadDto);
+    }
+    return addressRepository
+        .findByCreatedBy(contextHelper.findUserName(), pageable)
+        .map(addressMapper::toReadDto);
   }
 
   @Override
   @Transactional
   public AddressReadDto update(Long id, JsonNode patchNode) {
     // formatter:off
-    Address address = addressRepository.findByIdAndCreatedBy(id, contextHelper.findUserName())
-        .orElseThrow(() -> new AddressNotFoundException("Unable to update address: the old one not found"));
+    Address address;
+    if (contextHelper.isAdmin()) {
+      address =
+          addressRepository
+              .findById(id)
+              .orElseThrow(AddressNotFoundException::new);
+    } else {
+      address =
+          addressRepository
+              .findByIdAndCreatedBy(id, contextHelper.findUserName())
+              .orElseThrow(AddressNotFoundException::new);
+    }
 
     Address patchedAddress = patchUtil.applyPatchPreserve(address, patchNode, List.of("town"));
     Address patchedResult = addressRepository.save(patchedAddress);
@@ -78,10 +104,27 @@ public class AddressServiceImpl implements AddressService {
   @Transactional
   public AddressReadDto updateTown(Long addressId, Long townId) {
     // formatter:off
-    Address address = addressRepository.findByIdAndCreatedBy(addressId, contextHelper.findUserName())
-        .orElseThrow(() -> new AddressNotFoundException("Unable to update address: address not found"));
-    Location town = locationRepository.findByIdAndCreatedBy(townId, contextHelper.findUserName())
-        .orElseThrow(() -> new LocationNotFoundException("Unable to update address town: new town not found"));
+    Address address;
+    Location town;
+    if (contextHelper.isAdmin()) {
+      address =
+          addressRepository
+              .findById(addressId)
+              .orElseThrow(AddressNotFoundException::new);
+      town =
+          locationRepository
+              .findById(townId)
+              .orElseThrow(LocationNotFoundException::new);
+    } else {
+      address =
+          addressRepository
+              .findByIdAndCreatedBy(addressId, contextHelper.findUserName())
+              .orElseThrow(AddressNotFoundException::new);
+      town =
+          locationRepository
+              .findByIdAndCreatedBy(townId, contextHelper.findUserName())
+              .orElseThrow(LocationNotFoundException::new);
+    }
 
     address.setTown(town);
     Address updatedAddress = addressRepository.save(address);
@@ -93,6 +136,9 @@ public class AddressServiceImpl implements AddressService {
   @Override
   @Transactional
   public void delete(Long id) {
+    if (contextHelper.isAdmin()) {
+      addressRepository.deleteById(id);
+    }
     addressRepository.deleteByIdAndCreatedBy(id, contextHelper.findUserName());
   }
 }
