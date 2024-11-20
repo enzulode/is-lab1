@@ -48,17 +48,36 @@ public class OrganizationServiceImpl implements OrganizationService {
   @Transactional
   public OrganizationReadDto create(OrganizationCreateDto createDto) {
     // formatter:off
-    Coordinates existingCoordinates = coordinatesRepository
-        .findByIdAndCreatedBy(createDto.coordinatesId(), contextHelper.findUserName())
-        .orElseThrow(CoordinatesNotFoundException::new);
-
-    Address existingOfficialAddress = addressRepository
-        .findByIdAndCreatedBy(createDto.officialAddressId(), contextHelper.findUserName())
-        .orElseThrow(AddressNotFoundException::new);
-
-    Address existingPostalAddress = addressRepository
-        .findByIdAndCreatedBy(createDto.postalAddressId(), contextHelper.findUserName())
-        .orElseThrow(AddressNotFoundException::new);
+    Coordinates existingCoordinates;
+    Address existingOfficialAddress;
+    Address existingPostalAddress;
+    if (contextHelper.isAdmin()) {
+      existingCoordinates =
+          coordinatesRepository
+              .findById(createDto.coordinatesId())
+              .orElseThrow(CoordinatesNotFoundException::new);
+      existingOfficialAddress =
+          addressRepository
+              .findById(createDto.officialAddressId())
+              .orElseThrow(AddressNotFoundException::new);
+      existingPostalAddress =
+          addressRepository
+              .findById(createDto.postalAddressId())
+              .orElseThrow(AddressNotFoundException::new);
+    } else {
+      existingCoordinates =
+          coordinatesRepository
+              .findByIdAndCreatedBy(createDto.coordinatesId(), contextHelper.findUserName())
+              .orElseThrow(CoordinatesNotFoundException::new);
+      existingOfficialAddress =
+          addressRepository
+              .findByIdAndCreatedBy(createDto.officialAddressId(), contextHelper.findUserName())
+              .orElseThrow(AddressNotFoundException::new);
+      existingPostalAddress =
+          addressRepository
+              .findByIdAndCreatedBy(createDto.postalAddressId(), contextHelper.findUserName())
+              .orElseThrow(AddressNotFoundException::new);
+    }
 
     Organization organization = organizationMapper.toEntity(createDto);
     organization.setCoordinates(existingCoordinates);
@@ -72,16 +91,30 @@ public class OrganizationServiceImpl implements OrganizationService {
 
   @Override
   public Page<OrganizationReadDto> findAll(Pageable pageable) {
-    return organizationRepository.findAll(pageable).map(organizationMapper::toReadDto);
+    if (contextHelper.isAdmin()) {
+      return organizationRepository.findAll(pageable).map(organizationMapper::toReadDto);
+    }
+    return organizationRepository
+        .findByCreatedBy(contextHelper.findUserName(), pageable)
+        .map(organizationMapper::toReadDto);
   }
 
   @Override
   @Transactional
   public OrganizationReadDto update(Integer id, JsonNode patchNode) {
     // formatter:off
-    Organization organization = organizationRepository
-        .findByIdAndCreatedBy(id, contextHelper.findUserName())
-        .orElseThrow(OrganizationNotFoundException::new);
+    Organization organization;
+    if (contextHelper.isAdmin()) {
+      organization =
+          organizationRepository
+              .findById(id)
+              .orElseThrow(OrganizationNotFoundException::new);
+    } else {
+      organization =
+          organizationRepository
+              .findByIdAndCreatedBy(id, contextHelper.findUserName())
+              .orElseThrow(OrganizationNotFoundException::new);
+    }
 
     List<String> preserve = List.of("coordinates", "officialAddress", "postalAddress");
     Organization patchedOrganization = patchUtil.applyPatchPreserve(organization, patchNode, preserve);
@@ -95,13 +128,27 @@ public class OrganizationServiceImpl implements OrganizationService {
   @Transactional
   public OrganizationReadDto updateCoordinates(Integer organizationId, Long coordinatesId) {
     // formatter:off
-    Organization organization = organizationRepository
-        .findByIdAndCreatedBy(organizationId, contextHelper.findUserName())
-        .orElseThrow(OrganizationNotFoundException::new);
-
-    Coordinates coordinates = coordinatesRepository
-        .findByIdAndCreatedBy(coordinatesId, contextHelper.findUserName())
-        .orElseThrow(CoordinatesNotFoundException::new);
+    Organization organization;
+    Coordinates coordinates;
+    if (contextHelper.isAdmin()) {
+      organization =
+          organizationRepository
+              .findById(organizationId)
+              .orElseThrow(OrganizationNotFoundException::new);
+      coordinates =
+          coordinatesRepository
+              .findById(coordinatesId)
+              .orElseThrow(CoordinatesNotFoundException::new);
+    } else {
+      organization =
+          organizationRepository
+              .findByIdAndCreatedBy(organizationId, contextHelper.findUserName())
+              .orElseThrow(OrganizationNotFoundException::new);
+      coordinates =
+          coordinatesRepository
+              .findByIdAndCreatedBy(coordinatesId, contextHelper.findUserName())
+              .orElseThrow(CoordinatesNotFoundException::new);
+    }
 
     organization.setCoordinates(coordinates);
     Organization updatedOrganization = organizationRepository.save(organization);
@@ -114,15 +161,29 @@ public class OrganizationServiceImpl implements OrganizationService {
   @Transactional
   public OrganizationReadDto updateOfficialAddress(Integer organizationId, Long officialAddressId) {
     // formatter:off
-    Organization organization = organizationRepository
-        .findByIdAndCreatedBy(organizationId, contextHelper.findUserName())
-        .orElseThrow(OrganizationNotFoundException::new);
+    Organization organization;
+    Address officialAddress;
+    if (contextHelper.isAdmin()) {
+      organization =
+          organizationRepository
+              .findById(organizationId)
+              .orElseThrow(OrganizationNotFoundException::new);
+      officialAddress =
+          addressRepository
+              .findById(officialAddressId)
+              .orElseThrow(CoordinatesNotFoundException::new);
+    } else {
+      organization =
+          organizationRepository
+              .findByIdAndCreatedBy(organizationId, contextHelper.findUserName())
+              .orElseThrow(OrganizationNotFoundException::new);
+      officialAddress =
+          addressRepository
+              .findByIdAndCreatedBy(officialAddressId, contextHelper.findUserName())
+              .orElseThrow(CoordinatesNotFoundException::new);
+    }
 
-    Address address = addressRepository
-        .findByIdAndCreatedBy(officialAddressId, contextHelper.findUserName())
-        .orElseThrow(AddressNotFoundException::new);
-
-    organization.setOfficialAddress(address);
+    organization.setOfficialAddress(officialAddress);
     Organization updatedOrganization = organizationRepository.save(organization);
 
     return organizationMapper.toReadDto(updatedOrganization);
@@ -133,15 +194,29 @@ public class OrganizationServiceImpl implements OrganizationService {
   @Transactional
   public OrganizationReadDto updatePostalAddress(Integer organizationId, Long postalAddressId) {
     // formatter:off
-    Organization organization = organizationRepository
-        .findByIdAndCreatedBy(organizationId, contextHelper.findUserName())
-        .orElseThrow(OrganizationNotFoundException::new);
+    Organization organization;
+    Address postalAddress;
+    if (contextHelper.isAdmin()) {
+      organization =
+          organizationRepository
+              .findById(organizationId)
+              .orElseThrow(OrganizationNotFoundException::new);
+      postalAddress =
+          addressRepository
+              .findById(postalAddressId)
+              .orElseThrow(CoordinatesNotFoundException::new);
+    } else {
+      organization =
+          organizationRepository
+              .findByIdAndCreatedBy(organizationId, contextHelper.findUserName())
+              .orElseThrow(OrganizationNotFoundException::new);
+      postalAddress =
+          addressRepository
+              .findByIdAndCreatedBy(postalAddressId, contextHelper.findUserName())
+              .orElseThrow(CoordinatesNotFoundException::new);
+    }
 
-    Address address = addressRepository
-        .findByIdAndCreatedBy(postalAddressId, contextHelper.findUserName())
-        .orElseThrow(AddressNotFoundException::new);
-
-    organization.setPostalAddress(address);
+    organization.setPostalAddress(postalAddress);
     Organization updatedOrganization = organizationRepository.save(organization);
 
     return organizationMapper.toReadDto(updatedOrganization);
@@ -151,6 +226,9 @@ public class OrganizationServiceImpl implements OrganizationService {
   @Override
   @Transactional
   public void delete(Integer id) {
+    if (contextHelper.isAdmin()) {
+      organizationRepository.deleteById(id);
+    }
     organizationRepository.deleteByIdAndCreatedBy(id, contextHelper.findUserName());
   }
 

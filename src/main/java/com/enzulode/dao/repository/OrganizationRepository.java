@@ -2,6 +2,8 @@ package com.enzulode.dao.repository;
 
 import com.enzulode.dao.entity.Organization;
 import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -11,6 +13,8 @@ import org.springframework.stereotype.Repository;
 public interface OrganizationRepository extends JpaRepository<Organization, Integer> {
 
   Optional<Organization> findByIdAndCreatedBy(Integer id, String username);
+
+  Page<Organization> findByCreatedBy(String username, Pageable pageable);
 
   void deleteByIdAndCreatedBy(Integer id, String username);
 
