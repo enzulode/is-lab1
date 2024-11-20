@@ -5,6 +5,7 @@ springBootPlugin = "3.3.5"
 springDependencyManagementPlugin = "1.1.6"
 springCloudVersion = "2023.0.3"
 mapstruct = "1.6.3"
+keycloakAdminClient = "26.0.2"
 
 [plugins]
 springBoot = { id = "org.springframework.boot", version.ref = "springBootPlugin" }

@@ -37,6 +37,8 @@ dependencies {
     implementation("org.mapstruct:mapstruct:${libs.versions.mapstruct.get()}")
     annotationProcessor("org.mapstruct:mapstruct-processor:${libs.versions.mapstruct.get()}")
 
+    implementation("org.keycloak:keycloak-admin-client:${libs.versions.keycloakAdminClient.get()}")
+
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
