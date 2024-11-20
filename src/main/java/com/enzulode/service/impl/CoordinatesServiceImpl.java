@@ -46,15 +46,31 @@ public class CoordinatesServiceImpl implements CoordinatesService {
 
   @Override
   public Page<CoordinatesReadDto> findAll(Pageable pageable) {
-    return repository.findAll(pageable).map(coordinatesMapper::toReadDto);
+    if (contextHelper.isAdmin()) {
+      return repository.findAll(pageable).map(coordinatesMapper::toReadDto);
+    }
+
+    return repository
+        .findByCreatedBy(contextHelper.findUserName(), pageable)
+        .map(coordinatesMapper::toReadDto);
   }
 
   @Override
   @Transactional
   public CoordinatesReadDto update(Long id, JsonNode patchNode) {
     // formatter:off
-    Coordinates coordinates = repository.findByIdAndCreatedBy(id, contextHelper.findUserName())
-        .orElseThrow(() -> new CoordinatesNotFoundException("Unable to update coordinates: the old one not found"));
+    Coordinates coordinates;
+    if (contextHelper.isAdmin()) {
+      coordinates =
+          repository
+              .findById(id)
+              .orElseThrow(CoordinatesNotFoundException::new);
+    } else {
+      coordinates =
+          repository
+              .findByIdAndCreatedBy(id, contextHelper.findUserName())
+              .orElseThrow(CoordinatesNotFoundException::new);
+    }
 
     Coordinates patchedCoordinates = patchUtil.applyPatch(coordinates, patchNode);
     Coordinates patchResult = repository.save(patchedCoordinates);
@@ -66,6 +82,9 @@ public class CoordinatesServiceImpl implements CoordinatesService {
   @Override
   @Transactional
   public void delete(Long id) {
+    if (contextHelper.isAdmin()) {
+      repository.deleteById(id);
+    }
     repository.deleteByIdAndCreatedBy(id, contextHelper.findUserName());
   }
 }
