@@ -46,15 +46,30 @@ public class LocationServiceImpl implements LocationService {
 
   @Override
   public Page<LocationReadDto> findAll(Pageable pageable) {
-    return repository.findAll(pageable).map(locationMapper::toReadDto);
+    if (contextHelper.isAdmin()) {
+      return repository.findAll(pageable).map(locationMapper::toReadDto);
+    }
+    return repository
+        .findByCreatedBy(contextHelper.findUserName(), pageable)
+        .map(locationMapper::toReadDto);
   }
 
   @Override
   @Transactional
   public LocationReadDto update(Long id, JsonNode patchNode) {
     // formatter:off
-    Location location = repository.findByIdAndCreatedBy(id, contextHelper.findUserName())
-        .orElseThrow(() -> new LocationNotFoundException("Unable to update location: the old one not found"));
+    Location location;
+    if (contextHelper.isAdmin()) {
+      location =
+          repository
+              .findById(id)
+              .orElseThrow(LocationNotFoundException::new);
+    } else {
+      location =
+          repository
+              .findByIdAndCreatedBy(id, contextHelper.findUserName())
+              .orElseThrow(LocationNotFoundException::new);
+    }
 
     Location patchedLocation = patchUtil.applyPatch(location, patchNode);
     Location patchResult = repository.save(patchedLocation);
@@ -66,6 +81,9 @@ public class LocationServiceImpl implements LocationService {
   @Override
   @Transactional
   public void delete(Long id) {
+    if (contextHelper.isAdmin()) {
+      repository.deleteById(id);
+    }
     repository.deleteByIdAndCreatedBy(id, contextHelper.findUserName());
   }
 }
