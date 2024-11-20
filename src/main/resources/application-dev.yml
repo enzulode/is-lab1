@@ -1,3 +1,70 @@
+server:
+  port: 8080
+
 spring:
   application:
     name: organization-management
+
+  cloud:
+    kubernetes:
+      discovery:
+        all-namespaces: true
+
+  flyway:
+    locations:
+      - classpath:db/{vendor}/common
+      - classpath:db/{vendor}/dev
+    out-of-order: true
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate.show_sql: true
+    generate-ddl: true
+    open-in-view: false
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/dev
+    username: dev
+    password: dev
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: ${oauth2.serverBaseUrl}/${oauth2.serverJwkSetUri}
+
+management:
+  metrics:
+    distribution:
+      percentiles-histogram:
+        http:
+          server:
+            requests: true
+  tracing:
+    sampling:
+      probability: 1.0
+  zipkin:
+    tracing:
+      endpoint: https://zipkin.localdev/api/v2/spans
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    health:
+      probes:
+        enabled: true
+        add-additional-paths: true
+logging:
+  pattern:
+    level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
+
+oauth2:
+  serverBaseUrl: https://sso.keycloak.localdev
+  realm: devrealm
+  serverJwkSetUri: realms/${oauth2.realm}/protocol/openid-connect/certs
+  adminClientId: admin-cli
+  adminClientSecret: efusNZlWQqQbvJc1W9lhtRoJFvfOAwdk

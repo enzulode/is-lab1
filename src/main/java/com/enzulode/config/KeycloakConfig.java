@@ -2,6 +2,10 @@ package com.enzulode.config;
 
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
+import org.keycloak.OAuth2Constants;
+import org.keycloak.admin.client.Keycloak;
+import org.keycloak.admin.client.KeycloakBuilder;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
@@ -39,5 +43,20 @@ public class KeycloakConfig {
     // formatter:on
 
     return http.build();
+  }
+
+  @Bean
+  public Keycloak keycloakAdminClient(
+      @Value("${oauth2.serverBaseUrl}") String serverUrl,
+      @Value("${oauth2.realm}") String realm,
+      @Value("${oauth2.adminClientId}") String adminClientId,
+      @Value("${oauth2.adminClientSecret}") String adminClientSecret) {
+    return KeycloakBuilder.builder()
+        .serverUrl(serverUrl)
+        .realm(realm)
+        .grantType(OAuth2Constants.CLIENT_CREDENTIALS)
+        .clientId(adminClientId)
+        .clientSecret(adminClientSecret)
+        .build();
   }
 }
