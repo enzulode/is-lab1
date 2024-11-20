@@ -32,6 +32,7 @@ public class KeycloakConfig {
         .authorizeHttpRequests(
             httpRequests -> httpRequests
                 .requestMatchers("/actuator/**").permitAll()
+                .requestMatchers("/api/v1/ws").permitAll()
                 .anyRequest().authenticated()
         )
         .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(STATELESS))
