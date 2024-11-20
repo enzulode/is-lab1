@@ -12,7 +12,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: validate
     properties:
       hibernate.show_sql: true
     open-in-view: false
@@ -31,7 +31,7 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          jwk-set-uri: ${KC_JWK_SET_URI}
+          jwk-set-uri: ${oauth2.serverBaseUrl}/${oauth2.serverJwkSetUri}
 
 management:
   metrics:
@@ -58,3 +58,10 @@ management:
 logging:
   pattern:
     level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
+
+oauth2:
+  serverBaseUrl: ${KC_BASE_URL}
+  realm: ${KC_REALM}
+  serverJwkSetUri: realms/${oauth2.realm}/protocol/openid-connect/certs
+  adminClientId: ${KC_ADMIN_CLIENT}
+  adminClientSecret: ${KC_ADMIN_CLIENT_SECRET}
