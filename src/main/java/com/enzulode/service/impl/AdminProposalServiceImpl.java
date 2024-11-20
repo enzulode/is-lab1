@@ -50,6 +50,7 @@ public class AdminProposalServiceImpl implements AdminProposalService {
   }
 
   @Override
+  @PreAuthorize("hasRole('ADMIN')")
   public Page<ProposalReadDto> findAll(Pageable pageable) {
     return proposalRepository.findAll(pageable).map(proposalMapper::toReadDto);
   }
