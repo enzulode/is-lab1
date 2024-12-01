@@ -27,6 +27,12 @@ spring:
     username: ${PG_USERNAME}
     password: ${PG_PASSWORD}
 
+  rabbitmq:
+    username: ${RABBITMQ_USERNAME}
+    password: ${RABBITMQ_PASSWORD}
+    host: ${RABBITMQ_HOST}
+    port: ${RABBITMQ_PORT}
+
   security:
     oauth2:
       resourceserver:
@@ -65,3 +71,8 @@ oauth2:
   serverJwkSetUri: realms/${oauth2.realm}/protocol/openid-connect/certs
   adminClientId: ${KC_ADMIN_CLIENT}
   adminClientSecret: ${KC_ADMIN_CLIENT_SECRET}
+
+interactive:
+  exchange: 'app.updates'
+  queue: 'upd'
+  routing-key: 'updates.#'

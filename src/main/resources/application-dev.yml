@@ -30,6 +30,12 @@ spring:
     username: dev
     password: dev
 
+  rabbitmq:
+    username: admin
+    password: dev
+    host: ${RABBITMQ_HOST}
+    port: ${RABBITMQ_PORT}
+
   security:
     oauth2:
       resourceserver:
@@ -48,7 +54,7 @@ management:
       probability: 1.0
   zipkin:
     tracing:
-      endpoint: https://zipkin.localdev/api/v2/spans
+      endpoint: http://zipkin.localdev/api/v2/spans
   endpoints:
     web:
       exposure:
@@ -68,3 +74,8 @@ oauth2:
   serverJwkSetUri: realms/${oauth2.realm}/protocol/openid-connect/certs
   adminClientId: admin-cli
   adminClientSecret: efusNZlWQqQbvJc1W9lhtRoJFvfOAwdk
+
+interactive:
+  exchange: 'app.updates'
+  queue: 'upd'
+  routing-key: 'updates.#'
