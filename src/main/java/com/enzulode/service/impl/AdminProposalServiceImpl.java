@@ -1,12 +1,16 @@
 package com.enzulode.service.impl;
 
+import static com.enzulode.dto.EntityUpdateNotificationDto.NotificationType.*;
+
 import com.enzulode.dao.entity.Proposal;
 import com.enzulode.dao.entity.ProposalStatus;
 import com.enzulode.dao.repository.ProposalRepository;
+import com.enzulode.dto.EntityUpdateNotificationDto;
 import com.enzulode.dto.ProposalReadDto;
 import com.enzulode.dto.mapper.ProposalMapper;
 import com.enzulode.exception.proposal.ProposalNofFoundException;
 import com.enzulode.service.AdminProposalService;
+import com.enzulode.service.RabbitMQProducerService;
 import com.enzulode.util.SecurityContextHelper;
 import java.util.Collections;
 import org.keycloak.admin.client.Keycloak;
@@ -25,19 +29,24 @@ public class AdminProposalServiceImpl implements AdminProposalService {
   private final ProposalRepository proposalRepository;
   private final SecurityContextHelper contextHelper;
   private final Keycloak keycloakClient;
+  private final RabbitMQProducerService producerService;
 
   @Value("${oauth2.realm}")
   private String realm;
+
+  private final String routingKey = "updates.proposals";
 
   public AdminProposalServiceImpl(
       ProposalMapper proposalMapper,
       ProposalRepository proposalRepository,
       SecurityContextHelper contextHelper,
-      Keycloak keycloakClient) {
+      Keycloak keycloakClient,
+      RabbitMQProducerService producerService) {
     this.proposalMapper = proposalMapper;
     this.proposalRepository = proposalRepository;
     this.contextHelper = contextHelper;
     this.keycloakClient = keycloakClient;
+    this.producerService = producerService;
   }
 
   @Override
@@ -76,6 +85,9 @@ public class AdminProposalServiceImpl implements AdminProposalService {
         .roles()
         .realmLevel()
         .add(Collections.singletonList(adminRole));
+
+    EntityUpdateNotificationDto updateDto = new EntityUpdateNotificationDto(ADMIN_PROMOTION_ACCEPT);
+    producerService.sendToRabbitMQ(updateDto, routingKey);
   }
 
   @Override
@@ -89,5 +101,9 @@ public class AdminProposalServiceImpl implements AdminProposalService {
 
     proposal.setStatus(ProposalStatus.DECLINED);
     proposalRepository.save(proposal);
+
+    EntityUpdateNotificationDto updateDto =
+        new EntityUpdateNotificationDto(ADMIN_PROMOTION_DECLINE);
+    producerService.sendToRabbitMQ(updateDto, routingKey);
   }
 }

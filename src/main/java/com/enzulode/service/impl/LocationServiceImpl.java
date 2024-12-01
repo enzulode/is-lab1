@@ -1,12 +1,16 @@
 package com.enzulode.service.impl;
 
+import static com.enzulode.dto.EntityUpdateNotificationDto.NotificationType.*;
+
 import com.enzulode.dao.entity.Location;
 import com.enzulode.dao.repository.LocationRepository;
+import com.enzulode.dto.EntityUpdateNotificationDto;
 import com.enzulode.dto.LocationCreateDto;
 import com.enzulode.dto.LocationReadDto;
 import com.enzulode.dto.mapper.LocationMapper;
 import com.enzulode.exception.LocationNotFoundException;
 import com.enzulode.service.LocationService;
+import com.enzulode.service.RabbitMQProducerService;
 import com.enzulode.util.PatchUtil;
 import com.enzulode.util.SecurityContextHelper;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -22,16 +26,21 @@ public class LocationServiceImpl implements LocationService {
   private final SecurityContextHelper contextHelper;
   private final LocationMapper locationMapper;
   private final PatchUtil patchUtil;
+  private final RabbitMQProducerService producerService;
+
+  private final String routingKey = "updates.location";
 
   public LocationServiceImpl(
       LocationRepository repository,
       SecurityContextHelper contextHelper,
       LocationMapper locationMapper,
-      PatchUtil patchUtil) {
+      PatchUtil patchUtil,
+      RabbitMQProducerService producerService) {
     this.repository = repository;
     this.contextHelper = contextHelper;
     this.locationMapper = locationMapper;
     this.patchUtil = patchUtil;
+    this.producerService = producerService;
   }
 
   @Override
@@ -40,6 +49,10 @@ public class LocationServiceImpl implements LocationService {
     // formatter:off
     Location newLocation = locationMapper.toEntity(createDto);
     Location result = repository.save(newLocation);
+
+    EntityUpdateNotificationDto updateDto = new EntityUpdateNotificationDto(ENTITY_CREATION);
+    producerService.sendToRabbitMQ(updateDto, routingKey);
+
     return locationMapper.toReadDto(result);
     // formatter:on
   }
@@ -74,6 +87,9 @@ public class LocationServiceImpl implements LocationService {
     Location patchedLocation = patchUtil.applyPatch(location, patchNode);
     Location patchResult = repository.save(patchedLocation);
 
+    EntityUpdateNotificationDto updateDto = new EntityUpdateNotificationDto(ENTITY_MODIFICATION);
+    producerService.sendToRabbitMQ(updateDto, routingKey);
+
     return locationMapper.toReadDto(patchResult);
     // formatter:on
   }
@@ -85,5 +101,8 @@ public class LocationServiceImpl implements LocationService {
       repository.deleteById(id);
     }
     repository.deleteByIdAndCreatedBy(id, contextHelper.findUserName());
+
+    EntityUpdateNotificationDto updateDto = new EntityUpdateNotificationDto(ENTITY_DELETION);
+    producerService.sendToRabbitMQ(updateDto, routingKey);
   }
 }

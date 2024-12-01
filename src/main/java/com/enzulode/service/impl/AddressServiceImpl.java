@@ -1,15 +1,19 @@
 package com.enzulode.service.impl;
 
+import static com.enzulode.dto.EntityUpdateNotificationDto.NotificationType.*;
+
 import com.enzulode.dao.entity.Address;
 import com.enzulode.dao.entity.Location;
 import com.enzulode.dao.repository.AddressRepository;
 import com.enzulode.dao.repository.LocationRepository;
 import com.enzulode.dto.AddressCreateDto;
 import com.enzulode.dto.AddressReadDto;
+import com.enzulode.dto.EntityUpdateNotificationDto;
 import com.enzulode.dto.mapper.AddressMapper;
 import com.enzulode.exception.AddressNotFoundException;
 import com.enzulode.exception.LocationNotFoundException;
 import com.enzulode.service.AddressService;
+import com.enzulode.service.RabbitMQProducerService;
 import com.enzulode.util.PatchUtil;
 import com.enzulode.util.SecurityContextHelper;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -27,18 +31,23 @@ public class AddressServiceImpl implements AddressService {
   private final SecurityContextHelper contextHelper;
   private final AddressMapper addressMapper;
   private final PatchUtil patchUtil;
+  private final RabbitMQProducerService producerService;
+
+  private final String routingKey = "updates.address";
 
   public AddressServiceImpl(
       LocationRepository locationRepository,
       AddressRepository addressRepository,
       SecurityContextHelper contextHelper,
       AddressMapper addressMapper,
-      PatchUtil patchUtil) {
+      PatchUtil patchUtil,
+      RabbitMQProducerService producerService) {
     this.locationRepository = locationRepository;
     this.addressRepository = addressRepository;
     this.contextHelper = contextHelper;
     this.addressMapper = addressMapper;
     this.patchUtil = patchUtil;
+    this.producerService = producerService;
   }
 
   @Override
@@ -61,6 +70,9 @@ public class AddressServiceImpl implements AddressService {
     Address address = addressMapper.toEntity(createDto);
     address.setTown(existingTown);
     Address result = addressRepository.save(address);
+
+    EntityUpdateNotificationDto updateDto = new EntityUpdateNotificationDto(ENTITY_CREATION);
+    producerService.sendToRabbitMQ(updateDto, routingKey);
 
     return addressMapper.toReadDto(result);
     // formatter:on
@@ -96,6 +108,9 @@ public class AddressServiceImpl implements AddressService {
     Address patchedAddress = patchUtil.applyPatchPreserve(address, patchNode, List.of("town"));
     Address patchedResult = addressRepository.save(patchedAddress);
 
+    EntityUpdateNotificationDto updateDto = new EntityUpdateNotificationDto(ENTITY_MODIFICATION);
+    producerService.sendToRabbitMQ(updateDto, routingKey);
+
     return addressMapper.toReadDto(patchedResult);
     // formatter:on
   }
@@ -129,6 +144,9 @@ public class AddressServiceImpl implements AddressService {
     address.setTown(town);
     Address updatedAddress = addressRepository.save(address);
 
+    EntityUpdateNotificationDto updateDto = new EntityUpdateNotificationDto(ENTITY_MODIFICATION);
+    producerService.sendToRabbitMQ(updateDto, routingKey);
+
     return addressMapper.toReadDto(updatedAddress);
     // formatter:on
   }
@@ -139,6 +157,10 @@ public class AddressServiceImpl implements AddressService {
     if (contextHelper.isAdmin()) {
       addressRepository.deleteById(id);
     }
+
     addressRepository.deleteByIdAndCreatedBy(id, contextHelper.findUserName());
+
+    EntityUpdateNotificationDto updateDto = new EntityUpdateNotificationDto(ENTITY_DELETION);
+    producerService.sendToRabbitMQ(updateDto, routingKey);
   }
 }
