@@ -1,0 +1,9 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: org-mngmnt-rest-resource
+  namespace: dev
+rules:
+  - apiGroups: [""]
+    resources: ["pods", "pods/exec", "services", "endpoints"]
+    verbs: ["get", "list", "delete", "patch", "create"]
