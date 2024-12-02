@@ -33,8 +33,6 @@ public class AddressServiceImpl implements AddressService {
   private final PatchUtil patchUtil;
   private final RabbitMQProducerService producerService;
 
-  private final String routingKey = "updates.address";
-
   public AddressServiceImpl(
       LocationRepository locationRepository,
       AddressRepository addressRepository,
@@ -72,7 +70,7 @@ public class AddressServiceImpl implements AddressService {
     Address result = addressRepository.save(address);
 
     EntityUpdateNotificationDto updateDto = new EntityUpdateNotificationDto(ENTITY_CREATION);
-    producerService.sendToRabbitMQ(updateDto, routingKey);
+    producerService.sendToRabbitMQ(updateDto);
 
     return addressMapper.toReadDto(result);
     // formatter:on
@@ -109,7 +107,7 @@ public class AddressServiceImpl implements AddressService {
     Address patchedResult = addressRepository.save(patchedAddress);
 
     EntityUpdateNotificationDto updateDto = new EntityUpdateNotificationDto(ENTITY_MODIFICATION);
-    producerService.sendToRabbitMQ(updateDto, routingKey);
+    producerService.sendToRabbitMQ(updateDto);
 
     return addressMapper.toReadDto(patchedResult);
     // formatter:on
@@ -145,7 +143,7 @@ public class AddressServiceImpl implements AddressService {
     Address updatedAddress = addressRepository.save(address);
 
     EntityUpdateNotificationDto updateDto = new EntityUpdateNotificationDto(ENTITY_MODIFICATION);
-    producerService.sendToRabbitMQ(updateDto, routingKey);
+    producerService.sendToRabbitMQ(updateDto);
 
     return addressMapper.toReadDto(updatedAddress);
     // formatter:on
@@ -161,6 +159,6 @@ public class AddressServiceImpl implements AddressService {
     addressRepository.deleteByIdAndCreatedBy(id, contextHelper.findUserName());
 
     EntityUpdateNotificationDto updateDto = new EntityUpdateNotificationDto(ENTITY_DELETION);
-    producerService.sendToRabbitMQ(updateDto, routingKey);
+    producerService.sendToRabbitMQ(updateDto);
   }
 }

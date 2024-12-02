@@ -29,8 +29,6 @@ public class EmployeeServiceImpl implements EmployeeService {
   private final PatchUtil patchUtil;
   private final RabbitMQProducerService producerService;
 
-  private final String routingKey = "updates.employee";
-
   public EmployeeServiceImpl(
       EmployeeRepository employeeRepository,
       SecurityContextHelper contextHelper,
@@ -52,7 +50,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     Employee result = employeeRepository.save(employee);
 
     EntityUpdateNotificationDto updateDto = new EntityUpdateNotificationDto(ENTITY_CREATION);
-    producerService.sendToRabbitMQ(updateDto, routingKey);
+    producerService.sendToRabbitMQ(updateDto);
 
     return employeeMapper.toReadDto(result);
     // formatter:on
@@ -75,7 +73,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     Employee patchResult = employeeRepository.save(patchedEmployee);
 
     EntityUpdateNotificationDto updateDto = new EntityUpdateNotificationDto(ENTITY_MODIFICATION);
-    producerService.sendToRabbitMQ(updateDto, routingKey);
+    producerService.sendToRabbitMQ(updateDto);
 
     return employeeMapper.toReadDto(patchResult);
     // formatter:on
@@ -87,6 +85,6 @@ public class EmployeeServiceImpl implements EmployeeService {
     employeeRepository.deleteByIdAndCreatedBy(id, contextHelper.findUserName());
 
     EntityUpdateNotificationDto updateDto = new EntityUpdateNotificationDto(ENTITY_DELETION);
-    producerService.sendToRabbitMQ(updateDto, routingKey);
+    producerService.sendToRabbitMQ(updateDto);
   }
 }

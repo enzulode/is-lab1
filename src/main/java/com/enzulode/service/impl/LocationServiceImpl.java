@@ -28,8 +28,6 @@ public class LocationServiceImpl implements LocationService {
   private final PatchUtil patchUtil;
   private final RabbitMQProducerService producerService;
 
-  private final String routingKey = "updates.location";
-
   public LocationServiceImpl(
       LocationRepository repository,
       SecurityContextHelper contextHelper,
@@ -51,7 +49,7 @@ public class LocationServiceImpl implements LocationService {
     Location result = repository.save(newLocation);
 
     EntityUpdateNotificationDto updateDto = new EntityUpdateNotificationDto(ENTITY_CREATION);
-    producerService.sendToRabbitMQ(updateDto, routingKey);
+    producerService.sendToRabbitMQ(updateDto);
 
     return locationMapper.toReadDto(result);
     // formatter:on
@@ -88,7 +86,7 @@ public class LocationServiceImpl implements LocationService {
     Location patchResult = repository.save(patchedLocation);
 
     EntityUpdateNotificationDto updateDto = new EntityUpdateNotificationDto(ENTITY_MODIFICATION);
-    producerService.sendToRabbitMQ(updateDto, routingKey);
+    producerService.sendToRabbitMQ(updateDto);
 
     return locationMapper.toReadDto(patchResult);
     // formatter:on
@@ -103,6 +101,6 @@ public class LocationServiceImpl implements LocationService {
     repository.deleteByIdAndCreatedBy(id, contextHelper.findUserName());
 
     EntityUpdateNotificationDto updateDto = new EntityUpdateNotificationDto(ENTITY_DELETION);
-    producerService.sendToRabbitMQ(updateDto, routingKey);
+    producerService.sendToRabbitMQ(updateDto);
   }
 }

@@ -28,8 +28,6 @@ public class CoordinatesServiceImpl implements CoordinatesService {
   private final PatchUtil patchUtil;
   private final RabbitMQProducerService producerService;
 
-  private final String routingKey = "updates.coordinates";
-
   public CoordinatesServiceImpl(
       CoordinatesRepository repository,
       SecurityContextHelper contextHelper,
@@ -51,7 +49,7 @@ public class CoordinatesServiceImpl implements CoordinatesService {
     Coordinates result = repository.save(newCoordinates);
 
     EntityUpdateNotificationDto updateDto = new EntityUpdateNotificationDto(ENTITY_CREATION);
-    producerService.sendToRabbitMQ(updateDto, routingKey);
+    producerService.sendToRabbitMQ(updateDto);
 
     return coordinatesMapper.toReadDto(result);
     // formatter:on
@@ -89,7 +87,7 @@ public class CoordinatesServiceImpl implements CoordinatesService {
     Coordinates patchResult = repository.save(patchedCoordinates);
 
     EntityUpdateNotificationDto updateDto = new EntityUpdateNotificationDto(ENTITY_MODIFICATION);
-    producerService.sendToRabbitMQ(updateDto, routingKey);
+    producerService.sendToRabbitMQ(updateDto);
 
     return coordinatesMapper.toReadDto(patchResult);
     // formatter:on
@@ -105,6 +103,6 @@ public class CoordinatesServiceImpl implements CoordinatesService {
     repository.deleteByIdAndCreatedBy(id, contextHelper.findUserName());
 
     EntityUpdateNotificationDto updateDto = new EntityUpdateNotificationDto(ENTITY_DELETION);
-    producerService.sendToRabbitMQ(updateDto, routingKey);
+    producerService.sendToRabbitMQ(updateDto);
   }
 }

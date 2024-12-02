@@ -20,7 +20,7 @@ public class DefaultRabbitMQProducerServiceImpl implements RabbitMQProducerServi
   }
 
   @Override
-  public void sendToRabbitMQ(Object message, String routingKey) {
-    amqpTemplate.convertAndSend(exchange, routingKey, message);
+  public void sendToRabbitMQ(Object message) {
+    amqpTemplate.convertAndSend(exchange, "", message);
   }
 }

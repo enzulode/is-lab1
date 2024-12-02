@@ -33,8 +33,6 @@ public class OrganizationServiceImpl implements OrganizationService {
   private final PatchUtil patchUtil;
   private final RabbitMQProducerService producerService;
 
-  private final String routingKey = "updates.organization";
-
   public OrganizationServiceImpl(
       CoordinatesRepository coordinatesRepository,
       AddressRepository addressRepository,
@@ -95,7 +93,7 @@ public class OrganizationServiceImpl implements OrganizationService {
     Organization result = organizationRepository.save(organization);
 
     EntityUpdateNotificationDto updateDto = new EntityUpdateNotificationDto(ENTITY_CREATION);
-    producerService.sendToRabbitMQ(updateDto, routingKey);
+    producerService.sendToRabbitMQ(updateDto);
 
     return organizationMapper.toReadDto(result);
     // formatter:on
@@ -133,7 +131,7 @@ public class OrganizationServiceImpl implements OrganizationService {
     Organization patchedResult = organizationRepository.save(patchedOrganization);
 
     EntityUpdateNotificationDto updateDto = new EntityUpdateNotificationDto(ENTITY_MODIFICATION);
-    producerService.sendToRabbitMQ(updateDto, routingKey);
+    producerService.sendToRabbitMQ(updateDto);
 
     return organizationMapper.toReadDto(patchedResult);
     // formatter:on
@@ -170,7 +168,7 @@ public class OrganizationServiceImpl implements OrganizationService {
 
 
     EntityUpdateNotificationDto updateDto = new EntityUpdateNotificationDto(ENTITY_MODIFICATION);
-    producerService.sendToRabbitMQ(updateDto, routingKey);
+    producerService.sendToRabbitMQ(updateDto);
 
     return organizationMapper.toReadDto(updatedOrganization);
     // formatter:on
@@ -206,7 +204,7 @@ public class OrganizationServiceImpl implements OrganizationService {
     Organization updatedOrganization = organizationRepository.save(organization);
 
     EntityUpdateNotificationDto updateDto = new EntityUpdateNotificationDto(ENTITY_MODIFICATION);
-    producerService.sendToRabbitMQ(updateDto, routingKey);
+    producerService.sendToRabbitMQ(updateDto);
 
     return organizationMapper.toReadDto(updatedOrganization);
     // formatter:on
@@ -242,7 +240,7 @@ public class OrganizationServiceImpl implements OrganizationService {
     Organization updatedOrganization = organizationRepository.save(organization);
 
     EntityUpdateNotificationDto updateDto = new EntityUpdateNotificationDto(ENTITY_MODIFICATION);
-    producerService.sendToRabbitMQ(updateDto, routingKey);
+    producerService.sendToRabbitMQ(updateDto);
 
     return organizationMapper.toReadDto(updatedOrganization);
     // formatter:on
@@ -257,7 +255,7 @@ public class OrganizationServiceImpl implements OrganizationService {
     organizationRepository.deleteByIdAndCreatedBy(id, contextHelper.findUserName());
 
     EntityUpdateNotificationDto updateDto = new EntityUpdateNotificationDto(ENTITY_DELETION);
-    producerService.sendToRabbitMQ(updateDto, routingKey);
+    producerService.sendToRabbitMQ(updateDto);
   }
 
   @Override

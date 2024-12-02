@@ -34,8 +34,6 @@ public class AdminProposalServiceImpl implements AdminProposalService {
   @Value("${oauth2.realm}")
   private String realm;
 
-  private final String routingKey = "updates.proposals";
-
   public AdminProposalServiceImpl(
       ProposalMapper proposalMapper,
       ProposalRepository proposalRepository,
@@ -87,7 +85,7 @@ public class AdminProposalServiceImpl implements AdminProposalService {
         .add(Collections.singletonList(adminRole));
 
     EntityUpdateNotificationDto updateDto = new EntityUpdateNotificationDto(ADMIN_PROMOTION_ACCEPT);
-    producerService.sendToRabbitMQ(updateDto, routingKey);
+    producerService.sendToRabbitMQ(updateDto);
   }
 
   @Override
@@ -104,6 +102,6 @@ public class AdminProposalServiceImpl implements AdminProposalService {
 
     EntityUpdateNotificationDto updateDto =
         new EntityUpdateNotificationDto(ADMIN_PROMOTION_DECLINE);
-    producerService.sendToRabbitMQ(updateDto, routingKey);
+    producerService.sendToRabbitMQ(updateDto);
   }
 }
