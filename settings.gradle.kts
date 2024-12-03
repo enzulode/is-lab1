@@ -1,1 +1,1 @@
-rootProject.name = "is-lab1"
+rootProject.name = "orgmngmnt"

@@ -59,6 +59,5 @@ tasks.withType<Test>().configureEach {
 }
 
 tasks.named("bootBuildImage", BootBuildImage::class) {
-    val dockerImageName: String by project
-    imageName = "${dockerImageName}:v${project.version}"
+    imageName = "docker.io/library/${rootProject.name}:v${project.version}"
 }
