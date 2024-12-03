@@ -1,3 +1,6 @@
 package com.enzulode.dto;
 
-public record CoordinatesCreateDto(Float x, int y) {}
+import jakarta.validation.constraints.NotNull;
+
+public record CoordinatesCreateDto(
+    @NotNull(message = "Coordinates x coordinate should be specified.") Float x, int y) {}

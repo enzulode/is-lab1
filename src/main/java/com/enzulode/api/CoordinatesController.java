@@ -4,6 +4,7 @@ import com.enzulode.dto.CoordinatesCreateDto;
 import com.enzulode.dto.CoordinatesReadDto;
 import com.enzulode.service.CoordinatesService;
 import com.fasterxml.jackson.databind.JsonNode;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -21,7 +22,7 @@ public class CoordinatesController {
 
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
-  public CoordinatesReadDto createEndpoint(@RequestBody CoordinatesCreateDto createDto) {
+  public CoordinatesReadDto createEndpoint(@RequestBody @Valid CoordinatesCreateDto createDto) {
     return coordinatesService.create(createDto);
   }
 

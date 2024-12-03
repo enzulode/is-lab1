@@ -3,6 +3,7 @@ package com.enzulode.dao.entity;
 import com.enzulode.dao.entity.common.BusinessEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
@@ -16,7 +17,7 @@ public class Coordinates extends BusinessEntity {
   @SequenceGenerator(name = "coordinates_seq")
   private Long id;
 
-  private Float x;
+  @NotNull private Float x;
 
   private int y;
 
