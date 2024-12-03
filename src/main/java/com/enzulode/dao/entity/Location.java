@@ -2,6 +2,7 @@ package com.enzulode.dao.entity;
 
 import com.enzulode.dao.entity.common.BusinessEntity;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import java.util.Objects;
 import org.hibernate.proxy.HibernateProxy;
 
@@ -13,11 +14,11 @@ public class Location extends BusinessEntity {
   @SequenceGenerator(name = "location_seq")
   private Long id;
 
-  private Float x;
+  @NotNull private Float x;
 
   private double y;
 
-  private Long z;
+  @NotNull private Long z;
 
   public Location() {}
 

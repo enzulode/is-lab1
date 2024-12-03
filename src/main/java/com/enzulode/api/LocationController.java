@@ -4,6 +4,7 @@ import com.enzulode.dto.LocationCreateDto;
 import com.enzulode.dto.LocationReadDto;
 import com.enzulode.service.LocationService;
 import com.fasterxml.jackson.databind.JsonNode;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -21,7 +22,7 @@ public class LocationController {
 
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
-  public LocationReadDto createEndpoint(@RequestBody LocationCreateDto mutationDto) {
+  public LocationReadDto createEndpoint(@RequestBody @Valid LocationCreateDto mutationDto) {
     return locationService.create(mutationDto);
   }
 
