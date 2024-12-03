@@ -3,6 +3,7 @@ package com.enzulode.api;
 import com.enzulode.dto.*;
 import com.enzulode.service.OrganizationService;
 import com.fasterxml.jackson.databind.JsonNode;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -20,7 +21,7 @@ public class OrganizationController {
 
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
-  public OrganizationReadDto createEndpoint(@RequestBody OrganizationCreateDto mutationDto) {
+  public OrganizationReadDto createEndpoint(@RequestBody @Valid OrganizationCreateDto mutationDto) {
     return organizationService.create(mutationDto);
   }
 

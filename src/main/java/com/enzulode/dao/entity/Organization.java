@@ -2,6 +2,10 @@ package com.enzulode.dao.entity;
 
 import com.enzulode.dao.entity.common.BusinessEntity;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import org.hibernate.proxy.HibernateProxy;
@@ -14,24 +18,25 @@ public class Organization extends BusinessEntity {
   @SequenceGenerator(name = "organization_seq")
   private Integer id;
 
-  private String name;
+  @NotNull @NotBlank private String name;
 
   @ManyToOne
   @JoinColumn(name = "coordinates_id")
-  private Coordinates coordinates;
+  @NotNull private Coordinates coordinates;
 
-  private LocalDateTime creationDate;
+  @NotNull private LocalDateTime creationDate;
 
   @ManyToOne
   @JoinColumn(name = "official_address_id")
-  private Address officialAddress;
+  @NotNull private Address officialAddress;
 
-  private int annualTurnover;
+  @Positive private int annualTurnover;
 
-  private int employeesCount;
+  @Positive private int employeesCount;
 
-  private Double rating;
+  @Positive private Double rating;
 
+  @NotNull @Size(max = 1658)
   private String fullName;
 
   @Enumerated(EnumType.STRING)
@@ -39,7 +44,7 @@ public class Organization extends BusinessEntity {
 
   @ManyToOne
   @JoinColumn(name = "postal_address_id")
-  private Address postalAddress;
+  @NotNull private Address postalAddress;
 
   public Organization() {}
 
