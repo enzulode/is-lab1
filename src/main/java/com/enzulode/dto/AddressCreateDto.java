@@ -1,3 +1,6 @@
 package com.enzulode.dto;
 
-public record AddressCreateDto(String street, Long townId) {}
+import jakarta.validation.constraints.NotNull;
+
+public record AddressCreateDto(
+    String street, @NotNull(message = "Address townId should be specified.") Long townId) {}

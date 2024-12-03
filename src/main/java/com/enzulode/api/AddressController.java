@@ -4,6 +4,7 @@ import com.enzulode.dto.AddressCreateDto;
 import com.enzulode.dto.AddressReadDto;
 import com.enzulode.service.AddressService;
 import com.fasterxml.jackson.databind.JsonNode;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -21,7 +22,7 @@ public class AddressController {
 
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
-  public AddressReadDto createEndpoint(@RequestBody AddressCreateDto mutationDto) {
+  public AddressReadDto createEndpoint(@RequestBody @Valid AddressCreateDto mutationDto) {
     return addressService.create(mutationDto);
   }
 

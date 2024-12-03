@@ -3,6 +3,7 @@ package com.enzulode.dao.entity;
 import com.enzulode.dao.entity.common.BusinessEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
@@ -19,7 +20,7 @@ public class Address extends BusinessEntity {
   private String street;
 
   @OneToOne(optional = false, fetch = FetchType.EAGER)
-  private Location town;
+  @NotNull private Location town;
 
   @OneToMany(mappedBy = "officialAddress")
   @JsonIgnore
