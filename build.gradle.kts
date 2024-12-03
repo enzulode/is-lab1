@@ -1,3 +1,5 @@
+import org.springframework.boot.gradle.tasks.bundling.BootBuildImage
+
 plugins {
     id("is-lab1.java-conventions")
     alias(libs.plugins.springBoot)
@@ -5,7 +7,7 @@ plugins {
 }
 
 group = "com.enzulode"
-version = "1.0.0-SNAPSHOT"
+version = "1.0.50"
 
 configurations {
     compileOnly {
@@ -39,13 +41,25 @@ dependencies {
     implementation("org.mapstruct:mapstruct:${libs.versions.mapstruct.get()}")
     annotationProcessor("org.mapstruct:mapstruct-processor:${libs.versions.mapstruct.get()}")
 
-    implementation("org.keycloak:keycloak-admin-client:${libs.versions.keycloakAdminClient.get()}")
+    implementation("org.keycloak:keycloak-admin-client:${libs.versions.keycloakAdminClient.get()}") {
+        exclude("commons-io", "commons-io")
+        implementation("commons-io:commons-io:2.18.0")
+    }
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
+repositories {
+    maven { url = uri("https://repo.spring.io/milestone") }
+}
+
 tasks.withType<Test>().configureEach {
     useJUnitPlatform()
     testLogging.events("PASSED", "SKIPPED", "FAILED")
+}
+
+tasks.named("bootBuildImage", BootBuildImage::class) {
+    val dockerImageName: String by project
+    imageName = "${dockerImageName}:v${project.version}"
 }
