@@ -1,0 +1,37 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: org-management
+  namespace: dev
+  annotations:
+    nginx.ingress.kubernetes.io/enable-websocket: 'true'
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: management.localdev
+      http:
+        paths:
+          - backend:
+              service:
+                name: organization-management
+                port:
+                  name: http
+            path: /
+            pathType: ImplementationSpecific
+    - host: ws.management.localdev
+      http:
+        paths:
+          - backend:
+              service:
+                name: ws-organization-management
+                port:
+                  name: http
+            path: /
+            pathType: ImplementationSpecific
+  tls:
+    - hosts:
+        - management.localdev
+      secretName: management-localdev-tls
+    - hosts:
+        - ws.management.localdev
+      secretName: ws-management-localdev-tls
