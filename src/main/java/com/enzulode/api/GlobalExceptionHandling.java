@@ -3,9 +3,10 @@ package com.enzulode.api;
 import com.enzulode.dto.ErrorResponseDto;
 import com.enzulode.exception.*;
 import com.enzulode.exception.patch.PatchException;
-import java.util.stream.Collectors;
+import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -40,10 +41,10 @@ public class GlobalExceptionHandling {
   @ExceptionHandler(MethodArgumentNotValidException.class)
   public ResponseEntity<ErrorResponseDto> handleValidationExceptions(
       MethodArgumentNotValidException cause) {
-    String errorMessage =
+    List<String> errorMessages =
         cause.getBindingResult().getFieldErrors().stream()
-            .map(error -> "%s: %s".formatted(error.getField(), error.getDefaultMessage()))
-            .collect(Collectors.joining(", "));
-    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponseDto(errorMessage));
+            .map(FieldError::getDefaultMessage)
+            .toList();
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponseDto(errorMessages));
   }
 }
