@@ -26,7 +26,11 @@ dependencies {
 
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-security")
-    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa") {
+        exclude("org.hibernate", "hibernate-entitymanager")
+        exclude("org.hibernate", "hibernate-core")
+        implementation("org.eclipse.persistence:org.eclipse.persistence.jpa:4.0.4")
+    }
     implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     runtimeOnly("org.postgresql:postgresql")

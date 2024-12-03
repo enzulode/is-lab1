@@ -18,19 +18,19 @@ public interface OrganizationRepository extends JpaRepository<Organization, Inte
 
   void deleteByIdAndCreatedBy(Integer id, String username);
 
-  @Query(value = "select organization_total_rating()")
+  @Query(value = "select organization_total_rating()", nativeQuery = true)
   double totalRating();
 
-  @Query("select count_organization_full_name_less_than(:c_full_name)")
+  @Query(value = "select count_organization_full_name_less_than(:c_full_name)", nativeQuery = true)
   int countOrganizationFullNameLessThan(@Param("c_full_name") String fullName);
 
-  @Query("select count_organization_full_name_more_than(:c_full_name)")
+  @Query(value = "select count_organization_full_name_more_than(:c_full_name)", nativeQuery = true)
   int countOrganizationFullNameMoreThan(@Param("c_full_name") String fullName);
 
-  @Query("select remove_all_employees_on_organization(:org_id)")
+  @Query(value = "select remove_all_employees_on_organization(:org_id)", nativeQuery = true)
   void removeAllEmployeesOnOrganization(@Param("org_id") Integer organizationId);
 
-  @Query("select hire_employee_to_organization(:org_id, :e_id)")
+  @Query(value = "select hire_employee_to_organization(:org_id, :e_id)", nativeQuery = true)
   void hireEmployeeToOrganization(
       @Param("org_id") Integer organizationId, @Param("e_id") Long employeeId);
 }
