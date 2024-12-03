@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: organization-management
+  namespace: dev
+spec:
+  template:
+    metadata:
+      name: organization-management
+      namespace: dev
+      labels:
+        app: organization-management-backend
+    spec:
+      serviceAccountName: org-mngmnt-rest
+      containers:
+        - name: organization-management-backend
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8080
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8080
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          image: orgmngmnt:v1.0.50
+          env:
+            - name: PG_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: pg-ssh-creds
+                  key: pg-user
+            - name: PG_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: pg-ssh-creds
+                  key: pg-pass
+            - name: KC_BASE_URL
+              value: http://dev-keycloak.keycloak.svc.cluster.local
+            - name: KC_REALM
+              value: devrealm
+            - name: KC_ADMIN_CLIENT
+              value: admin-cli
+            - name: KC_ADMIN_CLIENT_SECRET
+              value: efusNZlWQqQbvJc1W9lhtRoJFvfOAwdk
+            - name: KC_JWK_SET_URI
+              value: http://dev-keycloak.keycloak.svc.cluster.local/realms/devrealm/protocol/openid-connect/certs
+            - name: PG_JDBC_URI
+              value: jdbc:postgresql://postgres.postgres-ssh.svc.cluster.local:5432/studs
+            - name: ZIPKIN_ENDPOINT
+              value: http://zipkin.zipkin.svc.cluster.local:9411/api/v2/spans
+            - name: RABBITMQ_USERNAME
+              value: admin
+            - name: RABBITMQ_PASSWORD
+              value: dev
+            - name: RABBITMQ_HOST
+              value: dev-rabbitmq.rabbitmq.svc.cluster.local
+            - name: RABBITMQ_PORT
+              value: '5672'
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+  selector:
+    matchLabels:
+      app: organization-management-backend
